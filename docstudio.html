@@ -187,6 +187,12 @@
   /* submit-a-request button + ticket modal */
   .submit-request-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 20px);margin:8px 10px 12px;background:var(--accent);color:var(--ink);border:none;padding:9px 10px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;}
   .submit-request-btn:hover{background:var(--gold);}
+  /* variant used in the topbar of the published site, right after the search bar */
+  .submit-request-btn--top{width:auto;margin:0;padding:8px 16px;border-radius:999px;flex-shrink:0;}
+
+  /* GitHub settings button (docstudio editor only) */
+  .settings-btn{background:none;border:1px solid var(--ink-line);color:#fff;width:34px;height:34px;flex-shrink:0;border-radius:999px;font-size:1rem;line-height:1;cursor:pointer;}
+  .settings-btn:hover{background:var(--ink-soft);}
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:200;align-items:center;justify-content:center;padding:20px;}
   .modal-overlay.is-open{display:flex;}
   .modal-box{background:var(--paper-raised);border-radius:12px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.35);}
@@ -230,6 +236,7 @@
       <input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off">
       <div class="search-results" id="searchResults"></div>
     </div>
+    <button class="settings-btn" id="githubSettingsBtn" title="GitHub publish settings">⚙</button>
     <button class="revert-btn" id="revertBtn" title="Roll back index.html to the version before your last publish" disabled>Revert Changes</button>
     <button class="export-btn" id="exportBtn">Publish</button>
   </header>
@@ -263,7 +270,6 @@
       <div class="rightbar-heading">General</div>
       <ul class="general-list"><li><a href="#" id="historyLink">🕘 <span>History of Changes</span></a></li></ul>
     </div>
-    <button class="submit-request-btn" id="submitRequestBtn">✉ Submit a Request</button>
   </aside>
 
   <main class="main" id="mainArea"></main>
@@ -297,6 +303,20 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="githubSettingsOverlay">
+  <div class="modal-box">
+    <div class="modal-head"><h2>GitHub Publish Settings</h2><button class="modal-close" id="ghSettingsCloseX">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Owner</label><input type="text" id="ghOwnerInput" placeholder="e.g. axtroid"></div>
+      <div class="form-row"><label>Repo</label><input type="text" id="ghRepoInput" placeholder="e.g. support"></div>
+      <div class="form-row"><label>Path to index.html</label><input type="text" id="ghPathInput" placeholder="e.g. documentation/docs/index.html"></div>
+      <div class="form-row"><label>Branch</label><input type="text" id="ghBranchInput" placeholder="e.g. main"></div>
+      <div class="form-row"><label>Personal access token</label><input type="text" id="ghTokenInput" placeholder="ghp_…"></div>
+      <button class="modal-submit-btn" id="ghSettingsSaveBtn">Save settings</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
 
@@ -307,7 +327,7 @@
    ============================================================ */
 var DATA_KEY = 'kb-studio-data-v1';
 var FAV_KEY  = 'kb-studio-favs-v1';
-const GITHUB_TOKEN = localStorage.getItem("github_token");
+var GITHUB_TOKEN = localStorage.getItem("github_token");
 
 const GITHUB_SETTINGS =
     JSON.parse(localStorage.getItem("github_settings") || "{}");
@@ -624,16 +644,20 @@ function renderArticle(main){
   document.getElementById('favToggleBtn').addEventListener('click', function(){ toggleFav(t.id); renderArticle(main); });
 }
 
-function logChange(tag, product, text){
-  data.changelog.unshift({date: today(), tag: tag, product: product, text: text});
+function logChange(tag, product, text, details){
+  data.changelog.unshift({date: today(), tag: tag, product: product, text: text, details: details || [text]});
 }
 
 function renderHistory(main){
   main.innerHTML = '<nav class="breadcrumb">Knowledge Base</nav><h1 class="article-title">History of Changes</h1><div class="article-body">' +
     data.changelog.map(function(e){
+      var details = e.details || [];
+      var showList = details.length>1 || (details.length===1 && details[0]!==e.text);
+      var list = showList ? '<ul style="margin:8px 0 0;padding-left:20px;">' +
+        details.map(function(d){ return '<li style="margin-bottom:4px;">'+escapeHtml(d)+'</li>'; }).join('') + '</ul>' : '';
       return '<div class="changelog-entry"><div class="changelog-date">'+escapeHtml(e.date)+'</div><div>'+
              '<span class="changelog-tag '+e.tag+'">'+e.tag+'</span> <strong>'+escapeHtml(e.product)+'</strong>'+
-             '<p style="margin-top:5px;">'+escapeHtml(e.text)+'</p></div></div>';
+             '<p style="margin-top:5px;">'+escapeHtml(e.text)+'</p>' + list + '</div></div>';
     }).join('') + '</div>';
 }
 
@@ -649,35 +673,34 @@ function openTopic(topicId){
 }
 
 var editSnapshot = null;
-function blocksSummary(blocks){
-  return (blocks||[]).map(function(b){
-    var bit = b.type;
-    if (b.type==='heading') bit += ':'+escapeHtml((b.html||'').replace(/<[^>]+>/g,'').slice(0,60));
-    else if (b.type==='paragraph'||b.type==='callout') bit += ':'+escapeHtml((b.html||'').replace(/<[^>]+>/g,'').slice(0,60));
-    else if (b.type==='code') bit += ':'+escapeHtml((b.text||'').slice(0,60));
-    else if (b.type==='list') bit += ':'+(b.items||[]).length+' items';
-    else if (b.type==='image') bit += ':'+escapeHtml(b.alt||b.caption||'image');
-    return b.id+'|'+bit;
-  });
+function truncateText(s, n){ s = String(s||'').trim(); return s.length>n ? s.slice(0,n)+'…' : s; }
+function blockSnapshot(b){
+  var text = '';
+  if (b.type==='heading' || b.type==='paragraph' || b.type==='callout') text = (b.html||'').replace(/<[^>]+>/g,'');
+  else if (b.type==='code') text = b.text||'';
+  else if (b.type==='list') text = (b.items||[]).join(' | ');
+  else if (b.type==='image') text = b.alt||b.caption||'image';
+  return {id:b.id, type:b.type, text:text};
 }
+function blocksSummary(blocks){ return (blocks||[]).map(blockSnapshot); }
+/* Returns an array of plain-language lines, each one a distinct,
+   readable before/after change — this is what History renders. */
 function describeTopicChanges(before, after){
   var notes = [];
-  if (before.title !== after.title) notes.push('renamed from "'+before.title+'" to "'+after.title+'"');
+  if (before.title !== after.title) notes.push('Title renamed from "'+before.title+'" to "'+after.title+'".');
   var beforeBlocks = blocksSummary(before.blocks), afterBlocks = blocksSummary(after.blocks);
-  var beforeIds = beforeBlocks.map(function(s){return s.split('|')[0];});
-  var afterIds  = afterBlocks.map(function(s){return s.split('|')[0];});
-  var added = afterBlocks.filter(function(s){return beforeIds.indexOf(s.split('|')[0])===-1;});
-  var removed = beforeBlocks.filter(function(s){return afterIds.indexOf(s.split('|')[0])===-1;});
-  var changed = afterBlocks.filter(function(s){
-    var id = s.split('|')[0];
-    var pos = beforeIds.indexOf(id);
-    return pos>-1 && beforeBlocks[pos]!==s;
+  var beforeById = {}; beforeBlocks.forEach(function(b){ beforeById[b.id] = b; });
+  var afterIds = afterBlocks.map(function(b){ return b.id; });
+  afterBlocks.forEach(function(b){
+    var prev = beforeById[b.id];
+    if (!prev) notes.push(b.type+' added: "'+truncateText(b.text,80)+'"');
+    else if (prev.text !== b.text) notes.push(b.type+' edited: "'+truncateText(prev.text,60)+'" → "'+truncateText(b.text,60)+'"');
   });
-  if (added.length) notes.push(added.length+' block(s) added ('+added.map(function(s){return s.split(':')[0].split('|')[1]+(s.split(':')[1]?': '+s.split(':').slice(1).join(':'):'');}).join('; ')+')');
-  if (removed.length) notes.push(removed.length+' block(s) removed');
-  if (changed.length) notes.push(changed.length+' block(s) edited');
-  if (!notes.length) return 'No visible content change.';
-  return notes.join('; ') + '.';
+  beforeBlocks.forEach(function(b){
+    if (afterIds.indexOf(b.id)===-1) notes.push(b.type+' removed: "'+truncateText(b.text,80)+'"');
+  });
+  if (!notes.length) notes.push('No visible content change.');
+  return notes;
 }
 function renderEditor(main){
   var t = getTopic(state.articleId);
@@ -704,8 +727,8 @@ function renderEditor(main){
   document.getElementById('saveTopicBtn').addEventListener('click', function(){
     t.updated = today();
     var prod = getProduct(getSection(t.sectionId).productId);
-    var detail = editSnapshot ? describeTopicChanges(editSnapshot, t) : 'Updated "'+t.title+'".';
-    logChange('updated', prod.name, '"'+t.title+'" — '+detail);
+    var details = editSnapshot ? describeTopicChanges(editSnapshot, t) : ['Updated "'+t.title+'".'];
+    logChange('updated', prod.name, '"'+t.title+'" updated', details);
     editSnapshot = { topicId: t.id, title: t.title, blocks: JSON.parse(JSON.stringify(t.blocks||[])) };
     saveData();
     renderNavTree();
@@ -1014,7 +1037,8 @@ function openTicketModal(){
   document.getElementById('ticketOverlay').classList.add('is-open');
 }
 function closeTicketModal(){ document.getElementById('ticketOverlay').classList.remove('is-open'); }
-document.getElementById('submitRequestBtn').addEventListener('click', openTicketModal);
+var submitRequestBtnEl = document.getElementById('submitRequestBtn');
+if (submitRequestBtnEl) submitRequestBtnEl.addEventListener('click', openTicketModal);
 document.getElementById('ticketCloseX').addEventListener('click', closeTicketModal);
 document.getElementById('ticketCloseBtn').addEventListener('click', closeTicketModal);
 document.getElementById('ticketOverlay').addEventListener('click', function(e){ if (e.target===this) closeTicketModal(); });
@@ -1078,6 +1102,43 @@ document.getElementById('ticketSubmitBtn').addEventListener('click', function(){
 });
 
 /* ============================================================
+   GITHUB SETTINGS MODAL — lets you enter owner/repo/path/branch/
+   token from the UI instead of having to set localStorage by hand.
+   Saving mutates GITHUB_SETTINGS in place (it stays const) and
+   reassigns GITHUB_TOKEN, so Publish picks up the new values
+   immediately without a page reload.
+   ============================================================ */
+function openGithubSettingsModal(){
+  document.getElementById('ghOwnerInput').value = GITHUB_SETTINGS.owner || '';
+  document.getElementById('ghRepoInput').value = GITHUB_SETTINGS.repo || '';
+  document.getElementById('ghPathInput').value = GITHUB_SETTINGS.path || '';
+  document.getElementById('ghBranchInput').value = GITHUB_SETTINGS.branch || '';
+  document.getElementById('ghTokenInput').value = GITHUB_TOKEN || '';
+  document.getElementById('githubSettingsOverlay').classList.add('is-open');
+}
+function closeGithubSettingsModal(){ document.getElementById('githubSettingsOverlay').classList.remove('is-open'); }
+document.getElementById('githubSettingsBtn').addEventListener('click', openGithubSettingsModal);
+document.getElementById('ghSettingsCloseX').addEventListener('click', closeGithubSettingsModal);
+document.getElementById('githubSettingsOverlay').addEventListener('click', function(e){ if (e.target===this) closeGithubSettingsModal(); });
+document.getElementById('ghSettingsSaveBtn').addEventListener('click', function(){
+  var owner = document.getElementById('ghOwnerInput').value.trim();
+  var repo = document.getElementById('ghRepoInput').value.trim();
+  var path = document.getElementById('ghPathInput').value.trim();
+  var branch = document.getElementById('ghBranchInput').value.trim() || 'main';
+  var token = document.getElementById('ghTokenInput').value.trim();
+  if (!owner || !repo || !path || !token){ alert('Owner, repo, path and token are all required.'); return; }
+  Object.keys(GITHUB_SETTINGS).forEach(function(k){ delete GITHUB_SETTINGS[k]; });
+  Object.assign(GITHUB_SETTINGS, { owner: owner, repo: repo, path: path, branch: branch });
+  GITHUB_TOKEN = token;
+  try{
+    localStorage.setItem('github_settings', JSON.stringify(GITHUB_SETTINGS));
+    localStorage.setItem('github_token', GITHUB_TOKEN);
+  }catch(e){}
+  closeGithubSettingsModal();
+  showToast('GitHub settings saved');
+});
+
+/* ============================================================
    EXPORT — builds a standalone static HTML file from current data
    ============================================================ */
 function buildStaticSite(){
@@ -1096,12 +1157,12 @@ function buildStaticSite(){
         '<div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid">' +
         '<div class="brand-text"><span class="brand-name"> SUPPORT</span></div></div>' +
         '<div class="search-wrap" id="searchWrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' +
-        '<input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off"><div class="search-results" id="searchResults"></div></div></header>' +
+        '<input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off"><div class="search-results" id="searchResults"></div></div>' +
+        '<button class="submit-request-btn submit-request-btn--top" id="submitRequestBtn">✉ Submit a Request</button></header>' +
       '<aside class="sidebar" id="sidebar"><div class="sidebar-section"><div class="sidebar-heading"><span>Product</span></div>' +
         '<select class="product-select" id="productSelect"></select></div>' +
         '<div class="sidebar-section" style="flex:1;"><div class="sidebar-heading"><span id="docsHeading">Documentation</span></div>' +
-        '<ul class="nav-tree" id="navTree"></ul></div>' +
-        '<button class="submit-request-btn" id="submitRequestBtn">✉ Submit a Request</button></aside>' +
+        '<ul class="nav-tree" id="navTree"></ul></div></aside>' +
       '<aside class="rightbar" id="rightbar">' +
         '<button class="rightbar-toggle" id="rightbarToggle" title="Collapse">›</button>' +
         '<div class="rightbar-section"><div class="rightbar-heading">Favourites</div>' +
@@ -1389,7 +1450,8 @@ function setRevertActive(active){
 document.getElementById('exportBtn').addEventListener('click', async function publishToGitHub(){
   var settings = GITHUB_SETTINGS;
   if (!settings.owner || !settings.repo || !settings.path || !settings.branch || !GITHUB_TOKEN){
-    alert('GitHub publish settings are missing (owner/repo/path/branch/token). These are read from this browser\'s localStorage ("github_settings" and "github_token").');
+    showToast('Add your GitHub publish settings first');
+    openGithubSettingsModal();
     return;
   }
   try{
