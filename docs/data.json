@@ -1,0 +1,75 @@
+{
+  "products": [
+    {
+      "id": "prod_nhu21dp",
+      "name": "Sample Product",
+      "category": "General"
+    }
+  ],
+  "sections": [
+    {
+      "id": "sec_p6yauaz",
+      "productId": "prod_nhu21dp",
+      "title": "Getting Started",
+      "order": 0
+    }
+  ],
+  "topics": [
+    {
+      "id": "top_lmc2lu9",
+      "sectionId": "sec_p6yauaz",
+      "title": "Quick Start Guide",
+      "order": 0,
+      "updated": "24 Jul 2026",
+      "blocks": [
+        {
+          "id": "blk_0p4pye8",
+          "type": "paragraph",
+          "html": "Whats changed"
+        },
+        {
+          "id": "blk_0t0o0ru",
+          "type": "callout",
+          "calloutType": "tip",
+          "html": "Whats changed"
+        }
+      ]
+    }
+  ],
+  "changelog": [
+    {
+      "date": "24 Jul 2026",
+      "tag": "updated",
+      "product": "Sample Product",
+      "text": "\"Quick Start Guide\" updated",
+      "details": [
+        "paragraph edited: \"Correct\" → \"Whats changed\"",
+        "callout edited: \"Correct\" → \"Whats changed\""
+      ]
+    },
+    {
+      "date": "24 Jul 2026",
+      "tag": "updated",
+      "product": "Sample Product",
+      "text": "\"Quick Start Guide\" — 2 block(s) edited."
+    },
+    {
+      "date": "24 Jul 2026",
+      "tag": "updated",
+      "product": "Sample Product",
+      "text": "\"Quick Start Guide\" — 2 block(s) edited."
+    },
+    {
+      "date": "24 Jul 2026",
+      "tag": "updated",
+      "product": "Sample Product",
+      "text": "Updated \"Quick Start Guide\"."
+    },
+    {
+      "date": "24 Jul 2026",
+      "tag": "added",
+      "product": "Sample Product",
+      "text": "Knowledge base created."
+    }
+  ]
+}
