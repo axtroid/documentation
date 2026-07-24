@@ -919,7 +919,11 @@ document.getElementById('historyLink').addEventListener('click', function(e){
    to tickets.json via the GitHub Contents API.
    ============================================================ */
 function buildSupportTicketsSite(){
-  var ghConfig = JSON.stringify({ settings: GITHUB_SETTINGS, token: GITHUB_TOKEN }).replace(/</g,'\\u003c');
+  var ghConfig = JSON.stringify({ settings: {
+        owner: GITHUB_SETTINGS.owner,
+        repo: GITHUB_SETTINGS.repo,
+        branch: GITHUB_SETTINGS.branch,
+        path: GITHUB_SETTINGS.path}).replace(/</g,'\\u003c');
   var css = document.querySelector('style').innerHTML
     .replace(/\.editor-toolbar[\s\S]*?@media \(max-width:1180px\)/, '@media (max-width:1180px)');
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
@@ -1159,7 +1163,11 @@ function buildStaticSite(){
   var json = JSON.stringify(data).replace(/</g,'\\u003c');
   /* Baked-in so any visitor's browser (which has no localStorage entry for
      these) can still file a support ticket that gets written to the repo. */
-  var ghConfig = JSON.stringify({ settings: GITHUB_SETTINGS, token: GITHUB_TOKEN }).replace(/</g,'\\u003c');
+  var ghConfig = JSON.stringify({ settings: {
+        owner: GITHUB_SETTINGS.owner,
+        repo: GITHUB_SETTINGS.repo,
+        branch: GITHUB_SETTINGS.branch,
+        path: GITHUB_SETTINGS.path}).replace(/</g,'\\u003c');
 
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Knowledge Base</title>' +
