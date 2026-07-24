@@ -246,6 +246,10 @@
    ============================================================ */
 var DATA_KEY = 'kb-studio-data-v1';
 var FAV_KEY  = 'kb-studio-favs-v1';
+const GITHUB_TOKEN = localStorage.getItem("github_token");
+
+const GITHUB_SETTINGS =
+    JSON.parse(localStorage.getItem("github_settings") || "{}");
 var dataVersion = null, favVersion = null;
 
 var CALLOUT_LABELS = {note:'Note',tip:'Tip',important:'Important',warning:'Warning',caution:'Caution'};
@@ -1046,14 +1050,44 @@ function writeFolderFiles(){
   }).catch(function(e){ console.error('index.html write failed', e); });
 }
 
-document.getElementById('exportBtn').addEventListener('click', function(){
-  var html = buildStaticSite();
-  var blob = new Blob([html], {type:'text/html'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'index.html';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  showToast('Site exported');
+document.getElementById('exportBtn').addEventListener('click', async function publishToGitHub() {
+
+    const html = buildStaticSite();
+
+    const base64 = btoa(unescape(encodeURIComponent(html)));
+
+    const settings = GITHUB_SETTINGS;
+
+    const token = GITHUB_TOKEN;
+
+    const url =
+        `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${settings.path}?ref=${settings.branch}`;
+
+    const current = await fetch(url,{
+        headers:{
+            Authorization:`Bearer ${token}`,
+            Accept:"application/vnd.github+json"
+        }
+    });
+
+    const file = await current.json();
+
+    await fetch(url,{
+        method:"PUT",
+        headers:{
+            Authorization:`Bearer ${token}`,
+            Accept:"application/vnd.github+json",
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            message:"Publish documentation",
+            content:base64,
+            sha:file.sha,
+            branch:settings.branch
+        })
+    });
+
+    showToast("Published Successfully");
 });
 
 /* ============================================================
