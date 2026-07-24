@@ -16,7 +16,7 @@
     --font-display:'Segoe UI Semibold','Segoe UI',system-ui,-apple-system,sans-serif;
     --font-body:'Segoe UI',system-ui,-apple-system,sans-serif;
     --font-mono:'Segoe UI',Consolas,'Courier New',monospace;
-    --sidebar-w:300px; --rightbar-w:280px;
+    --sidebar-w:220px; --rightbar-w:260px; --rightbar-w-collapsed:48px;
   }
   *{box-sizing:border-box;}
   body{margin:0;font-family:var(--font-body);color:var(--text-main);background:var(--paper);-webkit-font-smoothing:antialiased;}
@@ -24,7 +24,7 @@
   button{font-family:inherit;}
   ::selection{background:var(--gold-soft);}
 
-  .kb-shell{display:grid;grid-template-columns:var(--sidebar-w) 1fr var(--rightbar-w);grid-template-rows:auto 1fr auto;grid-template-areas:"topbar topbar topbar" "sidebar main rightbar" "footer footer footer";min-height:100vh;}
+  .kb-shell{display:grid;grid-template-columns:var(--sidebar-w) 1fr auto;grid-template-rows:auto 1fr auto;grid-template-areas:"topbar topbar topbar" "sidebar main rightbar" "footer footer footer";min-height:100vh;}
 
   /* topbar */
   .topbar{grid-area:topbar;background:var(--ink);border-bottom:1px solid var(--ink-line);display:flex;align-items:center;gap:18px;padding:0 22px;height:62px;position:sticky;top:0;z-index:40;}
@@ -83,7 +83,11 @@
   .sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--ink-line);text-align:center;font-size:.72rem;color:var(--sidebar-text-dim);}
 
   /* rightbar */
-  .rightbar{grid-area:rightbar;background:var(--paper-raised);border-left:1px solid var(--paper-line);padding:0;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;}
+  .rightbar{grid-area:rightbar;background:var(--paper-raised);border-left:1px solid var(--paper-line);padding:0;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;overflow-x:hidden;transition:width .18s ease;width:var(--rightbar-w);flex-shrink:0;}
+  .rightbar-toggle{position:sticky;top:0;display:flex;align-items:center;justify-content:center;width:100%;height:30px;background:none;border:none;border-bottom:1px solid var(--paper-line);color:var(--text-muted);cursor:pointer;font-size:.85rem;z-index:2;}
+  .rightbar-toggle:hover{background:#F1ECE1;color:var(--ink);}
+  .rightbar.collapsed{width:var(--rightbar-w-collapsed);}
+  .rightbar.collapsed .rightbar-section{display:none;}
   .rightbar-section{padding:16px 14px 6px;}
   .rightbar-section + .rightbar-section{border-top:1px solid var(--paper-line);}
   .rightbar-heading{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin-bottom:8px;padding:0 4px;}
@@ -128,7 +132,7 @@
   .changelog-entry{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--paper-line);}
   .changelog-date{font-family:var(--font-mono);font-size:.76rem;color:var(--text-muted);width:96px;flex-shrink:0;padding-top:2px;}
   .changelog-tag{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-bottom:5px;}
-  .changelog-tag.added{background:#E5F2E3;color:#2F7A34;} .changelog-tag.updated{background:#E7EEF7;color:#2E5F9E;}
+  .changelog-tag.added{background:#E5F2E3;color:#2F7A34;} .changelog-tag.updated{background:#E7EEF7;color:#2E5F9E;} .changelog-tag.removed{background:#FBE9E7;color:#B3261E;}
 
   /* ---------------- EDITOR (edit mode) ---------------- */
   .editor-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
@@ -173,6 +177,39 @@
     .main{padding:24px 18px 60px;}
     .brand-sub{display:none;}
   }
+
+  /* revert button (kept outside the editor-only block above so it also
+     survives into the published static site's stylesheet) */
+  .revert-btn{background:var(--ink-soft);color:#8D8A85;border:1px solid var(--ink-line);padding:8px 16px;border-radius:999px;font-size:.82rem;font-weight:700;cursor:not-allowed;flex-shrink:0;opacity:.5;}
+  .revert-btn.is-active{color:#fff;cursor:pointer;opacity:1;}
+  .revert-btn.is-active:hover{background:#B3261E;border-color:#B3261E;}
+
+  /* submit-a-request button + ticket modal */
+  .submit-request-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 20px);margin:8px 10px 12px;background:var(--accent);color:var(--ink);border:none;padding:9px 10px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;}
+  .submit-request-btn:hover{background:var(--gold);}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(20,18,15,.55);z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.is-open{display:flex;}
+  .modal-box{background:var(--paper-raised);border-radius:12px;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.35);}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--paper-line);}
+  .modal-head h2{margin:0;font-family:var(--font-display);font-size:1.15rem;color:var(--ink);}
+  .modal-close{background:none;border:none;font-size:1.3rem;line-height:1;cursor:pointer;color:var(--text-muted);padding:2px 6px;}
+  .modal-close:hover{color:var(--ink);}
+  .modal-body{padding:18px 20px;}
+  .form-row{margin-bottom:14px;}
+  .form-row label{display:block;font-size:.78rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;}
+  .form-row select, .form-row input[type=email], .form-row input[type=text]{width:100%;border:1px solid var(--paper-line);border-radius:6px;padding:9px 10px;font-size:.9rem;font-family:inherit;background:#fff;}
+  .query-toolbar{display:flex;gap:6px;margin-bottom:6px;}
+  .query-toolbar button{border:1px solid var(--paper-line);background:#fff;border-radius:6px;padding:5px 10px;font-size:.78rem;cursor:pointer;}
+  .query-toolbar button:hover{border-color:var(--accent);}
+  .query-editable{min-height:100px;border:1px solid var(--paper-line);border-radius:6px;padding:10px;font-size:.9rem;line-height:1.5;}
+  .query-editable:focus{outline:none;border-color:var(--accent);}
+  .query-editable img{max-width:100%;border-radius:6px;margin:6px 0;display:block;}
+  .modal-submit-btn{background:var(--ink);color:#fff;border:none;padding:10px 20px;border-radius:999px;font-size:.88rem;font-weight:700;cursor:pointer;}
+  .modal-submit-btn:hover{background:var(--ink-soft);}
+  .ticket-success{text-align:center;padding:30px 10px;}
+  .ticket-success .ok-icon{width:52px;height:52px;border-radius:50%;background:#E5F2E3;color:#2F7A34;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.6rem;}
+  .ticket-success p{font-size:.95rem;color:var(--text-main);margin:0 0 20px;}
+  .ticket-close-btn{background:var(--ink);color:#fff;border:none;padding:9px 22px;border-radius:999px;font-size:.85rem;font-weight:700;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -193,9 +230,7 @@
       <input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off">
       <div class="search-results" id="searchResults"></div>
     </div>
-    <input type="file" id="importFile" accept=".html,.json" style="display:none;">
-    <button class="export-btn" id="importBtn" style="background:var(--ink-soft);color:#fff;">Import Project ↓</button>
-    <button class="export-btn" id="connectFolderBtn" style="background:var(--ink-soft);color:#fff;" title="Auto-save to a local folder — Chrome/Edge only">Connect</button>
+    <button class="revert-btn" id="revertBtn" title="Roll back index.html to the version before your last publish" disabled>Revert Changes</button>
     <button class="export-btn" id="exportBtn">Publish</button>
   </header>
 
@@ -218,6 +253,7 @@
   </aside>
 
   <aside class="rightbar" id="rightbar">
+    <button class="rightbar-toggle" id="rightbarToggle" title="Collapse">›</button>
     <div class="rightbar-section">
       <div class="rightbar-heading">Favourites</div>
       <ul class="fav-list" id="favList"></ul>
@@ -227,6 +263,7 @@
       <div class="rightbar-heading">General</div>
       <ul class="general-list"><li><a href="#" id="historyLink">🕘 <span>History of Changes</span></a></li></ul>
     </div>
+    <button class="submit-request-btn" id="submitRequestBtn">✉ Submit a Request</button>
   </aside>
 
   <main class="main" id="mainArea"></main>
@@ -235,6 +272,30 @@
 </div>
 
 <div class="toast hidden" id="toast">Saved</div>
+
+<div class="modal-overlay" id="ticketOverlay">
+  <div class="modal-box">
+    <div class="modal-head"><h2>Submit a Request</h2><button class="modal-close" id="ticketCloseX">✕</button></div>
+    <div class="modal-body" id="ticketFormView">
+      <div class="form-row"><label>Product</label><select id="ticketProduct"></select></div>
+      <div class="form-row"><label>Section</label><select id="ticketSection"></select></div>
+      <div class="form-row"><label>Topic</label><select id="ticketTopic"></select></div>
+      <div class="form-row">
+        <label>Your query</label>
+        <div class="query-toolbar"><button type="button" id="ticketInsertImgBtn">🖼 Insert image</button></div>
+        <input type="file" accept="image/*" id="ticketImgFile" style="display:none;">
+        <div class="query-editable" id="ticketQuery" contenteditable="true" data-placeholder="Describe your issue…"></div>
+      </div>
+      <div class="form-row"><label>Email</label><input type="email" id="ticketEmail" placeholder="you@example.com" required></div>
+      <button class="modal-submit-btn" id="ticketSubmitBtn">Submit</button>
+    </div>
+    <div class="modal-body ticket-success" id="ticketSuccessView" style="display:none;">
+      <div class="ok-icon">✓</div>
+      <p>Thank you for the feedback. Your query will be attended shortly.</p>
+      <button class="ticket-close-btn" id="ticketCloseBtn">Close</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -320,7 +381,6 @@ function loadAll(cb){
 }
 function saveData(){
   storageSet(DATA_KEY, JSON.stringify(data));
-  writeFolderFiles(); /* no-op until a folder is connected */
 }
 function saveFavs(){
   storageSet(FAV_KEY, JSON.stringify(favourites));
@@ -454,7 +514,10 @@ function bindTreeEvents(){
     el.addEventListener('click', function(e){
       e.stopPropagation();
       var id = el.getAttribute('data-del-top');
+      var delTopic = getTopic(id);
       if (!confirm('Delete this topic?')) return;
+      if (delTopic){ var delSec=getSection(delTopic.sectionId); var delProd=delSec?getProduct(delSec.productId):null;
+        logChange('removed', delProd?delProd.name:'—', 'Deleted topic "'+delTopic.title+'".'); }
       data.topics = data.topics.filter(function(t){return t.id!==id;});
       if (state.articleId===id) state.articleId=null;
       saveData(); renderNavTree(); renderMain();
@@ -473,7 +536,10 @@ function bindTreeEvents(){
     el.addEventListener('click', function(e){
       e.stopPropagation();
       var id = el.getAttribute('data-del-sec');
+      var delSec = getSection(id);
       if (!confirm('Delete this section and all its topics?')) return;
+      if (delSec){ var delProd=getProduct(delSec.productId);
+        logChange('removed', delProd?delProd.name:'—', 'Deleted section "'+delSec.title+'" and its topics.'); }
       data.topics = data.topics.filter(function(t){return t.sectionId!==id;});
       data.sections = data.sections.filter(function(s){return s.id!==id;});
       saveData(); renderNavTree(); renderMain();
@@ -582,9 +648,43 @@ function openTopic(topicId){
   renderMain();
 }
 
+var editSnapshot = null;
+function blocksSummary(blocks){
+  return (blocks||[]).map(function(b){
+    var bit = b.type;
+    if (b.type==='heading') bit += ':'+escapeHtml((b.html||'').replace(/<[^>]+>/g,'').slice(0,60));
+    else if (b.type==='paragraph'||b.type==='callout') bit += ':'+escapeHtml((b.html||'').replace(/<[^>]+>/g,'').slice(0,60));
+    else if (b.type==='code') bit += ':'+escapeHtml((b.text||'').slice(0,60));
+    else if (b.type==='list') bit += ':'+(b.items||[]).length+' items';
+    else if (b.type==='image') bit += ':'+escapeHtml(b.alt||b.caption||'image');
+    return b.id+'|'+bit;
+  });
+}
+function describeTopicChanges(before, after){
+  var notes = [];
+  if (before.title !== after.title) notes.push('renamed from "'+before.title+'" to "'+after.title+'"');
+  var beforeBlocks = blocksSummary(before.blocks), afterBlocks = blocksSummary(after.blocks);
+  var beforeIds = beforeBlocks.map(function(s){return s.split('|')[0];});
+  var afterIds  = afterBlocks.map(function(s){return s.split('|')[0];});
+  var added = afterBlocks.filter(function(s){return beforeIds.indexOf(s.split('|')[0])===-1;});
+  var removed = beforeBlocks.filter(function(s){return afterIds.indexOf(s.split('|')[0])===-1;});
+  var changed = afterBlocks.filter(function(s){
+    var id = s.split('|')[0];
+    var pos = beforeIds.indexOf(id);
+    return pos>-1 && beforeBlocks[pos]!==s;
+  });
+  if (added.length) notes.push(added.length+' block(s) added ('+added.map(function(s){return s.split(':')[0].split('|')[1]+(s.split(':')[1]?': '+s.split(':').slice(1).join(':'):'');}).join('; ')+')');
+  if (removed.length) notes.push(removed.length+' block(s) removed');
+  if (changed.length) notes.push(changed.length+' block(s) edited');
+  if (!notes.length) return 'No visible content change.';
+  return notes.join('; ') + '.';
+}
 function renderEditor(main){
   var t = getTopic(state.articleId);
   if (!t){ main.innerHTML='<div class="empty-state">Topic not found.</div>'; return; }
+  if (!editSnapshot || editSnapshot.topicId !== t.id){
+    editSnapshot = { topicId: t.id, title: t.title, blocks: JSON.parse(JSON.stringify(t.blocks||[])) };
+  }
   var html = '<div class="editor-toolbar">'+
       '<input class="topic-title" id="titleInput" value="'+escapeHtml(t.title)+'">'+
       '<button class="save-btn" id="saveTopicBtn">Save topic</button></div>'+
@@ -604,7 +704,9 @@ function renderEditor(main){
   document.getElementById('saveTopicBtn').addEventListener('click', function(){
     t.updated = today();
     var prod = getProduct(getSection(t.sectionId).productId);
-    logChange('updated', prod.name, 'Updated "'+t.title+'".');
+    var detail = editSnapshot ? describeTopicChanges(editSnapshot, t) : 'Updated "'+t.title+'".';
+    logChange('updated', prod.name, '"'+t.title+'" — '+detail);
+    editSnapshot = { topicId: t.id, title: t.title, blocks: JSON.parse(JSON.stringify(t.blocks||[])) };
     saveData();
     renderNavTree();
     showToast('Saved');
@@ -775,6 +877,206 @@ document.getElementById('historyLink').addEventListener('click', function(e){
   renderMain();
 });
 
+/* Collapsible right (favourites) sidebar */
+(function(){
+  var rb = document.getElementById('rightbar');
+  var btn = document.getElementById('rightbarToggle');
+  btn.addEventListener('click', function(){
+    var collapsed = rb.classList.toggle('collapsed');
+    btn.textContent = collapsed ? '‹' : '›';
+    btn.title = collapsed ? 'Expand' : 'Collapse';
+  });
+})();
+
+/* ============================================================
+   SUPPORT TICKETS ADMIN PAGE — a standalone file (support-tickets.html)
+   published alongside index.html. It fetches tickets.json at runtime
+   (never bakes ticket data in, since tickets.json changes independently)
+   and lets an admin flip each ticket's status, writing the change back
+   to tickets.json via the GitHub Contents API.
+   ============================================================ */
+function buildSupportTicketsSite(){
+  var ghConfig = JSON.stringify({ settings: GITHUB_SETTINGS, token: GITHUB_TOKEN }).replace(/</g,'\\u003c');
+  var css = document.querySelector('style').innerHTML
+    .replace(/\.editor-toolbar[\s\S]*?@media \(max-width:1180px\)/, '@media (max-width:1180px)');
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Support Tickets</title>' +
+    '<style>' + css + '\n' +
+    '.tickets-wrap{max-width:900px;margin:0 auto;padding:36px 24px 80px;}' +
+    '.tickets-topbar{display:flex;align-items:center;gap:12px;padding:0 24px;height:62px;background:var(--ink);}' +
+    '.ticket-card{border:1px solid var(--paper-line);border-radius:var(--radius);background:var(--paper-raised);margin-bottom:16px;overflow:hidden;}' +
+    '.ticket-card-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:12px 16px;background:#F3EFE6;font-size:.8rem;color:var(--text-muted);}' +
+    '.ticket-card-head strong{color:var(--ink);}' +
+    '.ticket-status{margin-left:auto;font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 10px;border-radius:999px;}' +
+    '.ticket-status.open{background:#FBE9E7;color:#B3261E;} .ticket-status.in-progress{background:#FBF1E1;color:var(--accent-dark);} .ticket-status.resolved{background:#E5F2E3;color:#2F7A34;}' +
+    '.ticket-card-body{padding:16px;font-size:.9rem;line-height:1.6;}' +
+    '.ticket-card-body img{max-width:100%;border-radius:6px;margin:6px 0;display:block;}' +
+    '.ticket-meta-row{font-size:.78rem;color:var(--text-muted);margin-top:10px;}' +
+    '.ticket-actions{display:flex;gap:8px;padding:0 16px 16px;}' +
+    '.ticket-actions button{border:1px solid var(--paper-line);background:#fff;border-radius:999px;padding:6px 14px;font-size:.78rem;cursor:pointer;}' +
+    '.ticket-actions button:hover{border-color:var(--accent);color:var(--accent-dark);}' +
+    '.ticket-actions button.is-current{background:var(--ink);color:#fff;border-color:var(--ink);}' +
+    '</style></head><body style="background:var(--paper);">' +
+    '<header class="tickets-topbar"><div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid">' +
+    '<div class="brand-text"><span class="brand-name">SUPPORT TICKETS</span></div></div></header>' +
+    '<div class="tickets-wrap"><div id="ticketsList">Loading tickets…</div></div>' +
+    '<script>window.__GH_CONFIG__=' + ghConfig + ';' + supportTicketsRuntimeJs() + '</' + 'script>' +
+    '</body></html>';
+}
+function supportTicketsRuntimeJs(){
+  return '(' + function(){
+    var GH = window.__GH_CONFIG__ || {settings:{}, token:null};
+    function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+    function ghUrl(path){ return 'https://api.github.com/repos/'+GH.settings.owner+'/'+GH.settings.repo+'/contents/'+path+'?ref='+GH.settings.branch; }
+    function ghHeaders(json){ var h={Authorization:'Bearer '+GH.token, Accept:'application/vnd.github+json'}; if(json) h['Content-Type']='application/json'; return h; }
+    function siblingPath(filename){ return (GH.settings.path||'').replace(/[^/]+$/,'') + filename; }
+    function ghGetFile(path){ return fetch(ghUrl(path),{headers:ghHeaders(false)}).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }); }
+    function ghPutFile(path, contentString, message, sha){
+      var body={message:message, content:btoa(unescape(encodeURIComponent(contentString))), branch:GH.settings.branch};
+      if (sha) body.sha = sha;
+      return fetch(ghUrl(path),{method:'PUT',headers:ghHeaders(true),body:JSON.stringify(body)}).then(function(r){return r.json();});
+    }
+    var ticketsPath = siblingPath('tickets.json');
+    var currentSha = null;
+    function statusLabel(s){ return s==='in-progress' ? 'In Progress' : s==='resolved' ? 'Resolved' : 'Open'; }
+    function render(list){
+      var wrap = document.getElementById('ticketsList');
+      if (!list.length){ wrap.innerHTML = '<p style="color:var(--text-muted);">No support tickets yet.</p>'; return; }
+      wrap.innerHTML = list.slice().reverse().map(function(t){
+        return '<div class="ticket-card" data-ticket="'+t.id+'">' +
+          '<div class="ticket-card-head"><strong>'+esc(t.product||'')+'</strong><span>'+esc(t.section||'')+' › '+esc(t.topic||'')+'</span>' +
+          '<span class="ticket-status '+(t.status||'open')+'">'+statusLabel(t.status||'open')+'</span></div>' +
+          '<div class="ticket-card-body">'+ (t.query||'') +
+          '<div class="ticket-meta-row">From '+esc(t.email||'')+' — '+esc(t.date||'')+'</div></div>' +
+          '<div class="ticket-actions">' +
+            '<button data-set-status="open" class="'+((t.status||'open')==='open'?'is-current':'')+'">Open</button>' +
+            '<button data-set-status="in-progress" class="'+(t.status==='in-progress'?'is-current':'')+'">In Progress</button>' +
+            '<button data-set-status="resolved" class="'+(t.status==='resolved'?'is-current':'')+'">Resolved</button>' +
+          '</div></div>';
+      }).join('');
+    }
+    function load(){
+      ghGetFile(ticketsPath).then(function(existing){
+        var list = [];
+        if (existing && existing.content){
+          currentSha = existing.sha;
+          try{ list = JSON.parse(decodeURIComponent(escape(atob(existing.content.replace(/\n/g,''))))); }catch(e){ list = []; }
+        }
+        render(list);
+        bindActions(list);
+      });
+    }
+    function bindActions(list){
+      document.querySelectorAll('[data-set-status]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var card = btn.closest('[data-ticket]');
+          var id = card.getAttribute('data-ticket');
+          var status = btn.getAttribute('data-set-status');
+          var ticket = list.find(function(t){ return t.id===id; });
+          if (!ticket) return;
+          ticket.status = status;
+          ghPutFile(ticketsPath, JSON.stringify(list, null, 2), 'Update ticket status', currentSha).then(function(res){
+            if (res && res.content) currentSha = res.content.sha;
+            render(list); bindActions(list);
+          }).catch(function(e){ alert('Could not update status: '+e.message); });
+        });
+      });
+    }
+    load();
+  }.toString() + ')();';
+}
+
+/* ============================================================
+   SUPPORT TICKETS — "Submit a Request" modal (shared markup also
+   embedded into the published static site by buildStaticSite).
+   ============================================================ */
+function ticketProductOptions(){
+  return data.products.map(function(p){ return '<option value="'+p.id+'">'+escapeHtml(p.name)+'</option>'; }).join('');
+}
+function refreshTicketSections(){
+  var pid = document.getElementById('ticketProduct').value;
+  var secSel = document.getElementById('ticketSection');
+  secSel.innerHTML = sectionsFor(pid).map(function(s){ return '<option value="'+s.id+'">'+escapeHtml(s.title)+'</option>'; }).join('');
+  refreshTicketTopics();
+}
+function refreshTicketTopics(){
+  var sid = document.getElementById('ticketSection').value;
+  var topSel = document.getElementById('ticketTopic');
+  topSel.innerHTML = topicsFor(sid).map(function(t){ return '<option value="'+t.id+'">'+escapeHtml(t.title)+'</option>'; }).join('');
+}
+function openTicketModal(){
+  document.getElementById('ticketProduct').innerHTML = ticketProductOptions();
+  refreshTicketSections();
+  document.getElementById('ticketQuery').innerHTML = '';
+  document.getElementById('ticketEmail').value = '';
+  document.getElementById('ticketFormView').style.display = 'block';
+  document.getElementById('ticketSuccessView').style.display = 'none';
+  document.getElementById('ticketOverlay').classList.add('is-open');
+}
+function closeTicketModal(){ document.getElementById('ticketOverlay').classList.remove('is-open'); }
+document.getElementById('submitRequestBtn').addEventListener('click', openTicketModal);
+document.getElementById('ticketCloseX').addEventListener('click', closeTicketModal);
+document.getElementById('ticketCloseBtn').addEventListener('click', closeTicketModal);
+document.getElementById('ticketOverlay').addEventListener('click', function(e){ if (e.target===this) closeTicketModal(); });
+document.getElementById('ticketProduct').addEventListener('change', refreshTicketSections);
+document.getElementById('ticketSection').addEventListener('change', refreshTicketTopics);
+document.getElementById('ticketInsertImgBtn').addEventListener('click', function(){ document.getElementById('ticketImgFile').click(); });
+document.getElementById('ticketImgFile').addEventListener('change', function(){
+  var file = this.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var img = document.createElement('img');
+    img.src = reader.result;
+    document.getElementById('ticketQuery').appendChild(img);
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+async function persistTicket(ticket){
+  try{
+    var path = siblingPath('tickets.json');
+    var existing = await ghGetFile(path);
+    var list = [];
+    if (existing && existing.content){
+      try{ list = JSON.parse(decodeURIComponent(escape(atob(existing.content.replace(/\n/g,''))))); }catch(e){ list = []; }
+    }
+    list.push(ticket);
+    await ghPutFile(path, JSON.stringify(list, null, 2), 'New support ticket', existing ? existing.sha : null);
+    return true;
+  }catch(e){
+    console.error('Ticket sync to GitHub failed, keeping locally', e);
+    try{
+      var pending = JSON.parse(localStorage.getItem('kb_pending_tickets')||'[]');
+      pending.push(ticket);
+      localStorage.setItem('kb_pending_tickets', JSON.stringify(pending));
+    }catch(e2){}
+    return false;
+  }
+}
+document.getElementById('ticketSubmitBtn').addEventListener('click', function(){
+  var email = document.getElementById('ticketEmail').value.trim();
+  if (!email || email.indexOf('@')===-1){ alert('Please enter a valid email address.'); return; }
+  var prod = getProduct(document.getElementById('ticketProduct').value);
+  var sec = getSection(document.getElementById('ticketSection').value);
+  var top = getTopic(document.getElementById('ticketTopic').value);
+  var ticket = {
+    id: uid('tick'),
+    date: today(),
+    product: prod ? prod.name : '',
+    section: sec ? sec.title : '',
+    topic: top ? top.title : '',
+    query: document.getElementById('ticketQuery').innerHTML,
+    email: email,
+    status: 'open'
+  };
+  document.getElementById('ticketSubmitBtn').disabled = true;
+  persistTicket(ticket).then(function(){
+    document.getElementById('ticketSubmitBtn').disabled = false;
+    document.getElementById('ticketFormView').style.display = 'none';
+    document.getElementById('ticketSuccessView').style.display = 'block';
+  });
+});
+
 /* ============================================================
    EXPORT — builds a standalone static HTML file from current data
    ============================================================ */
@@ -782,10 +1084,13 @@ function buildStaticSite(){
   var shellCss = document.querySelector('style').innerHTML
     .replace(/\.editor-toolbar[\s\S]*?@media \(max-width:1180px\)/, '@media (max-width:1180px)'); // strip editor-only CSS block
   var json = JSON.stringify(data).replace(/</g,'\\u003c');
+  /* Baked-in so any visitor's browser (which has no localStorage entry for
+     these) can still file a support ticket that gets written to the repo. */
+  var ghConfig = JSON.stringify({ settings: GITHUB_SETTINGS, token: GITHUB_TOKEN }).replace(/</g,'\\u003c');
 
   return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Knowledge Base</title>' +
-    '<style>' + shellCss + '\n.mode-toggle,.export-btn,#addProductBtn,.add-btn,.row-actions .icon-sm{display:none !important;}</style></head><body>' +
+    '<style>' + shellCss + '\n.mode-toggle,.export-btn,#addProductBtn,.add-btn,.row-actions .icon-sm,.revert-btn{display:none !important;}</style></head><body>' +
     '<div class="kb-shell" id="kbShell">' +
       '<header class="topbar"><button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button>' +
         '<div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid">' +
@@ -795,17 +1100,41 @@ function buildStaticSite(){
       '<aside class="sidebar" id="sidebar"><div class="sidebar-section"><div class="sidebar-heading"><span>Product</span></div>' +
         '<select class="product-select" id="productSelect"></select></div>' +
         '<div class="sidebar-section" style="flex:1;"><div class="sidebar-heading"><span id="docsHeading">Documentation</span></div>' +
-        '<ul class="nav-tree" id="navTree"></ul></div><div class="sidebar-footer">Axtroid | SUPPORT v1.0.3</div></aside>' +
-      '<aside class="rightbar" id="rightbar"><div class="rightbar-section"><div class="rightbar-heading">Favourites</div>' +
-        '<ul class="fav-list" id="favList"></ul><p class="fav-empty" id="favEmpty">Star an article to pin it here.</p></div>' +
-        '<div class="rightbar-section"><div class="rightbar-heading">General</div><ul class="general-list">' +
-        '<li><a href="#" id="historyLink">🕘 <span>History of Changes</span></a></li></ul></div></aside>' +
+        '<ul class="nav-tree" id="navTree"></ul></div>' +
+        '<button class="submit-request-btn" id="submitRequestBtn">✉ Submit a Request</button></aside>' +
+      '<aside class="rightbar" id="rightbar">' +
+        '<button class="rightbar-toggle" id="rightbarToggle" title="Collapse">›</button>' +
+        '<div class="rightbar-section"><div class="rightbar-heading">Favourites</div>' +
+        '<ul class="fav-list" id="favList"></ul><p class="fav-empty" id="favEmpty">Star an article to pin it here.</p></div></aside>' +
       '<main class="main" id="mainArea"></main>' +
       '<div class="sidebar-backdrop" id="sidebarBackdrop"></div>' +
       '<footer class="site-footer">&copy; 2026 Axtroid. All rights reserved.</footer>' +
       '</div>' +
-    '<script>window.__KB_DATA__=' + json + ';window.__KB_READONLY__=true;' + exportRuntimeJs() + '</' + 'script>' +
+      buildTicketModalMarkup() +
+    '<script>window.__KB_DATA__=' + json + ';window.__KB_READONLY__=true;window.__GH_CONFIG__=' + ghConfig + ';' + exportRuntimeJs() + '</' + 'script>' +
     '</body></html>';
+}
+
+/* Ticket modal markup shared between the docstudio preview and the
+   published static site (identical DOM so the same CSS applies). */
+function buildTicketModalMarkup(){
+  return '<div class="modal-overlay" id="ticketOverlay"><div class="modal-box">' +
+    '<div class="modal-head"><h2>Submit a Request</h2><button class="modal-close" id="ticketCloseX">✕</button></div>' +
+    '<div class="modal-body" id="ticketFormView">' +
+      '<div class="form-row"><label>Product</label><select id="ticketProduct"></select></div>' +
+      '<div class="form-row"><label>Section</label><select id="ticketSection"></select></div>' +
+      '<div class="form-row"><label>Topic</label><select id="ticketTopic"></select></div>' +
+      '<div class="form-row"><label>Your query</label>' +
+        '<div class="query-toolbar"><button type="button" id="ticketInsertImgBtn">🖼 Insert image</button></div>' +
+        '<input type="file" accept="image/*" id="ticketImgFile" style="display:none;">' +
+        '<div class="query-editable" id="ticketQuery" contenteditable="true"></div></div>' +
+      '<div class="form-row"><label>Email</label><input type="email" id="ticketEmail" placeholder="you@example.com" required></div>' +
+      '<button class="modal-submit-btn" id="ticketSubmitBtn">Submit</button>' +
+    '</div>' +
+    '<div class="modal-body ticket-success" id="ticketSuccessView" style="display:none;">' +
+      '<div class="ok-icon">✓</div><p>Thank you for the feedback. Your query will be attended shortly.</p>' +
+      '<button class="ticket-close-btn" id="ticketCloseBtn">Close</button>' +
+    '</div></div></div>';
 }
 
 /* Trimmed runtime for the exported file: rendering + search + favourites
@@ -835,7 +1164,7 @@ function exportRuntimeJs(){
       return '';
     }
     var currentProductId = data.products[0] ? data.products[0].id : null;
-    var articleId = null, showingHistory = false;
+    var articleId = null;
     function renderProductSelect(){
       var sel=document.getElementById('productSelect');
       sel.innerHTML = data.products.map(function(p){return '<option value="'+p.id+'">'+esc(p.name)+'</option>';}).join('');
@@ -876,15 +1205,13 @@ function exportRuntimeJs(){
       list.querySelectorAll('[data-goto-fav]').forEach(function(el){el.addEventListener('click',function(e){e.preventDefault();openTopic(el.getAttribute('data-goto-fav'));});});
     }
     function openTopic(id){
-      articleId=id; showingHistory=false;
+      articleId=id;
       document.querySelectorAll('.nav-row.is-active').forEach(function(r){r.classList.remove('is-active');});
       var row=document.querySelector('[data-select-topic="'+id+'"]'); if(row){row.classList.add('is-active');var p=row.closest('ul').closest('.nav-node');if(p)p.classList.add('is-open');}
-      document.getElementById('historyLink').classList.remove('is-active');
       renderMain();
     }
     function renderMain(){
       var main=document.getElementById('mainArea');
-      if(showingHistory){renderHistory(main);return;}
       if(articleId){renderArticle(main);return;}
       main.innerHTML='<div class="empty-state">Select a topic from the sidebar.</div>';
     }
@@ -900,14 +1227,6 @@ function exportRuntimeJs(){
         '<div class="article-body">'+(t.blocks||[]).map(blockToHtml).join('')+'</div>';
       document.getElementById('favToggleBtn').addEventListener('click',function(){toggleFav(t.id);renderArticle(main);});
     }
-    function renderHistory(main){
-      main.innerHTML='<nav class="breadcrumb">Knowledge Base</nav><h1 class="article-title">History of Changes</h1><div class="article-body">'+
-        data.changelog.map(function(e){return '<div class="changelog-entry"><div class="changelog-date">'+esc(e.date)+'</div><div>'+
-        '<span class="changelog-tag '+e.tag+'">'+e.tag+'</span> <strong>'+esc(e.product)+'</strong><p style="margin-top:5px;">'+esc(e.text)+'</p></div></div>';}).join('')+'</div>';
-    }
-    document.getElementById('historyLink').addEventListener('click',function(e){e.preventDefault();showingHistory=true;articleId=null;
-      document.querySelectorAll('.nav-row.is-active').forEach(function(r){r.classList.remove('is-active');});
-      document.getElementById('historyLink').classList.add('is-active'); renderMain();});
     function buildIdx(){var idx=[];data.topics.forEach(function(t){var sec=getSection(t.sectionId);if(!sec)return;var prod=getProduct(sec.productId);if(!prod)return;idx.push({id:t.id,title:t.title,path:prod.name+' › '+sec.title});});return idx;}
     var wrap=document.getElementById('searchWrap'),input=document.getElementById('kbSearch'),results=document.getElementById('searchResults');
     input.addEventListener('input',function(){
@@ -933,161 +1252,203 @@ function exportRuntimeJs(){
         if(e.target.closest('[data-select-topic]')&&window.matchMedia('(max-width:860px)').matches){shell.classList.remove('sidebar-open');}
       });
     })();
+    (function(){
+      var rb=document.getElementById('rightbar'), btn=document.getElementById('rightbarToggle');
+      btn.addEventListener('click',function(){
+        var collapsed=rb.classList.toggle('collapsed');
+        btn.textContent=collapsed?'‹':'›';
+        btn.title=collapsed?'Expand':'Collapse';
+      });
+    })();
+    /* ---------- Submit a Request (ticket) modal ---------- */
+    (function(){
+      var GH = window.__GH_CONFIG__ || {settings:{}, token:null};
+      function ghUrl(path){ return 'https://api.github.com/repos/'+GH.settings.owner+'/'+GH.settings.repo+'/contents/'+path+'?ref='+GH.settings.branch; }
+      function ghHeaders(json){ var h={Authorization:'Bearer '+GH.token, Accept:'application/vnd.github+json'}; if(json) h['Content-Type']='application/json'; return h; }
+      function siblingPath(filename){ return (GH.settings.path||'').replace(/[^/]+$/,'') + filename; }
+      function ghGetFile(path){ return fetch(ghUrl(path),{headers:ghHeaders(false)}).then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }); }
+      function ghPutFile(path, contentString, message, sha){
+        var body={message:message, content:btoa(unescape(encodeURIComponent(contentString))), branch:GH.settings.branch};
+        if (sha) body.sha = sha;
+        return fetch(ghUrl(path),{method:'PUT',headers:ghHeaders(true),body:JSON.stringify(body)}).then(function(r){return r.json();});
+      }
+      function uid(prefix){ return prefix+'_'+Math.random().toString(36).slice(2,9); }
+      function today(){ var d=new Date(); var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear(); }
+      function ticketProductOptions(){ return data.products.map(function(p){return '<option value="'+p.id+'">'+esc(p.name)+'</option>';}).join(''); }
+      function refreshTicketSections(){
+        var pid=document.getElementById('ticketProduct').value;
+        document.getElementById('ticketSection').innerHTML = sectionsFor(pid).map(function(s){return '<option value="'+s.id+'">'+esc(s.title)+'</option>';}).join('');
+        refreshTicketTopics();
+      }
+      function refreshTicketTopics(){
+        var sid=document.getElementById('ticketSection').value;
+        document.getElementById('ticketTopic').innerHTML = topicsFor(sid).map(function(t){return '<option value="'+t.id+'">'+esc(t.title)+'</option>';}).join('');
+      }
+      function openTicketModal(){
+        document.getElementById('ticketProduct').innerHTML = ticketProductOptions();
+        refreshTicketSections();
+        document.getElementById('ticketQuery').innerHTML = '';
+        document.getElementById('ticketEmail').value = '';
+        document.getElementById('ticketFormView').style.display='block';
+        document.getElementById('ticketSuccessView').style.display='none';
+        document.getElementById('ticketOverlay').classList.add('is-open');
+      }
+      function closeTicketModal(){ document.getElementById('ticketOverlay').classList.remove('is-open'); }
+      document.getElementById('submitRequestBtn').addEventListener('click', openTicketModal);
+      document.getElementById('ticketCloseX').addEventListener('click', closeTicketModal);
+      document.getElementById('ticketCloseBtn').addEventListener('click', closeTicketModal);
+      document.getElementById('ticketOverlay').addEventListener('click', function(e){ if(e.target===this) closeTicketModal(); });
+      document.getElementById('ticketProduct').addEventListener('change', refreshTicketSections);
+      document.getElementById('ticketSection').addEventListener('change', refreshTicketTopics);
+      document.getElementById('ticketInsertImgBtn').addEventListener('click', function(){ document.getElementById('ticketImgFile').click(); });
+      document.getElementById('ticketImgFile').addEventListener('change', function(){
+        var file=this.files[0]; if(!file) return;
+        var reader=new FileReader();
+        reader.onload=function(){ var img=document.createElement('img'); img.src=reader.result; document.getElementById('ticketQuery').appendChild(img); };
+        reader.readAsDataURL(file);
+        this.value='';
+      });
+      function persistTicket(ticket){
+        var path = siblingPath('tickets.json');
+        return ghGetFile(path).then(function(existing){
+          var list=[];
+          if (existing && existing.content){ try{ list=JSON.parse(decodeURIComponent(escape(atob(existing.content.replace(/\n/g,''))))); }catch(e){ list=[]; } }
+          list.push(ticket);
+          return ghPutFile(path, JSON.stringify(list,null,2), 'New support ticket', existing?existing.sha:null);
+        }).catch(function(e){
+          console.error('Ticket sync failed, keeping locally', e);
+          try{ var pending=JSON.parse(localStorage.getItem('kb_pending_tickets')||'[]'); pending.push(ticket); localStorage.setItem('kb_pending_tickets', JSON.stringify(pending)); }catch(e2){}
+        });
+      }
+      document.getElementById('ticketSubmitBtn').addEventListener('click', function(){
+        var email=document.getElementById('ticketEmail').value.trim();
+        if (!email || email.indexOf('@')===-1){ alert('Please enter a valid email address.'); return; }
+        var prod=getProduct(document.getElementById('ticketProduct').value);
+        var sec=getSection(document.getElementById('ticketSection').value);
+        var top=getTopic(document.getElementById('ticketTopic').value);
+        var ticket={ id:uid('tick'), date:today(), product:prod?prod.name:'', section:sec?sec.title:'', topic:top?top.title:'',
+          query:document.getElementById('ticketQuery').innerHTML, email:email, status:'open' };
+        document.getElementById('ticketSubmitBtn').disabled=true;
+        persistTicket(ticket).then(function(){
+          document.getElementById('ticketSubmitBtn').disabled=false;
+          document.getElementById('ticketFormView').style.display='none';
+          document.getElementById('ticketSuccessView').style.display='block';
+        });
+      });
+    })();
   }.toString() + ')();';
 }
 
 /* ============================================================
-   IMPORT — read an existing index.html back into the
-   studio, whether it's a prior studio export or the original
-   hardcoded PRODUCTS/TEMPLATES-style file.
+   GITHUB HELPERS — shared by publish, revert, and ticket sync.
    ============================================================ */
-function braceMatchEnd(text, openIdx){
-  var open = text[openIdx], close = open==='{' ? '}' : ']';
-  var depth = 0, inStr = false, strCh = '';
-  for (var i=openIdx; i<text.length; i++){
-    var c = text[i];
-    if (inStr){ if (c==='\\'){ i++; continue; } if (c===strCh) inStr=false; continue; }
-    if (c==='"' || c==="'"){ inStr=true; strCh=c; continue; }
-    if (c===open) depth++;
-    else if (c===close){ depth--; if (depth===0) return i; }
-  }
-  return -1;
+function ghUrl(path){
+  var settings = GITHUB_SETTINGS;
+  return `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${path}?ref=${settings.branch}`;
 }
-function extractVar(text, name){
-  var m = new RegExp('var\\s+'+name+'\\s*=\\s*([\\[{])').exec(text);
-  if (!m) return null;
-  var openIdx = m.index + m[0].length - 1;
-  var endIdx = braceMatchEnd(text, openIdx);
-  if (endIdx===-1) return null;
-  try { return new Function('return (' + text.slice(openIdx, endIdx+1) + ');')(); }
-  catch(e){ console.error('could not parse '+name, e); return null; }
+function ghHeaders(json){
+  var h = { Authorization:`Bearer ${GITHUB_TOKEN}`, Accept:"application/vnd.github+json" };
+  if (json) h["Content-Type"] = "application/json";
+  return h;
 }
-function afterImportRefresh(){
-  currentProductId = null; state.articleId = null; state.showingHistory = false;
-  renderProductSelect(); renderNavTree(); renderFavList(); renderMain();
+/* Sibling path helper: swaps the filename of settings.path for another file
+   in the same folder, e.g. "documentation/docs/index.html" -> ".../data.json" */
+function siblingPath(filename){
+  var base = GITHUB_SETTINGS.path.replace(/[^/]+$/, '');
+  return base + filename;
 }
-function importFromText(text, filename){
-  /* 1) a bare data.json (the file the folder connection writes) */
-  try{
-    var bare = JSON.parse(text);
-    if (bare && Array.isArray(bare.products)){
-      if (!confirm('Load the knowledge base from "'+filename+'"? This replaces everything currently in the studio.')) return;
-      data = bare;
-      saveData(); afterImportRefresh(); showToast('Imported'); return;
-    }
-  }catch(e){ /* not bare JSON — keep trying below */ }
-
-  /* 2) a previously-generated studio HTML export */
-  var studioMatch = /window\.__KB_DATA__\s*=\s*(\{[\s\S]*?\});\s*window\.__KB_READONLY__/.exec(text);
-  if (studioMatch){
-    try{
-      var parsed = JSON.parse(studioMatch[1]);
-      if (!confirm('Replace everything currently in the studio with the content from "'+filename+'"?')) return;
-      data = parsed;
-      saveData(); afterImportRefresh(); showToast('Imported');
-    }catch(e){ alert('Could not read this file: '+e.message); }
-    return;
-  }
-  /* fall back to the original hardcoded PRODUCTS / TEMPLATES format */
-  var PRODUCTS = extractVar(text, 'PRODUCTS');
-  var TEMPLATES = extractVar(text, 'TEMPLATES');
-  var CHANGELOG = extractVar(text, 'CHANGELOG') || [];
-  if (!PRODUCTS || !TEMPLATES){ alert('Could not find recognizable knowledge base data in "'+filename+'".'); return; }
-  var newProducts=[], newSections=[], newTopics=[];
-  PRODUCTS.forEach(function(p){
-    newProducts.push({id:p.id, name:p.name, category:p.category||'General'});
-    var sections = TEMPLATES[p.template] || [];
-    sections.forEach(function(sec, sIdx){
-      var secId = uid('sec');
-      newSections.push({id:secId, productId:p.id, title:sec.title, order:sIdx});
-      (sec.topics||[]).forEach(function(topicTitle, tIdx){
-        newTopics.push({id:uid('top'), sectionId:secId, title:topicTitle, order:tIdx, updated: today(),
-          blocks:[{id:uid('blk'), type:'paragraph', html:'Imported from the existing knowledge base — replace with real content.'}]});
-      });
-    });
-  });
-  if (!confirm('Found '+newProducts.length+' products and '+newTopics.length+' topics in "'+filename+'" (existing topic titles were kept; article bodies were placeholders in the original file, so they import as empty placeholder paragraphs). Replace everything currently in the studio?')) return;
-  data = { products:newProducts, sections:newSections, topics:newTopics,
-    changelog: CHANGELOG.map(function(c){ return {date:c.date, tag:c.tag, product:c.product, text:c.text}; }) };
-  saveData(); afterImportRefresh(); showToast('Imported '+newProducts.length+' products');
+async function ghGetFile(path){
+  var res = await fetch(ghUrl(path), { headers: ghHeaders(false) });
+  if (!res.ok) return null;
+  return res.json();
 }
-document.getElementById('importBtn').addEventListener('click', function(){ document.getElementById('importFile').click(); });
-document.getElementById('importFile').addEventListener('change', function(){
-  var file = this.files[0]; if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(){ importFromText(reader.result, file.name); };
-  reader.readAsText(file);
-  this.value = '';
-});
+async function ghPutFile(path, contentString, message, shaOrNull){
+  var base64 = btoa(unescape(encodeURIComponent(contentString)));
+  var body = { message: message, content: base64, branch: GITHUB_SETTINGS.branch };
+  if (shaOrNull) body.sha = shaOrNull;
+  var res = await fetch(ghUrl(path), { method:"PUT", headers: ghHeaders(true), body: JSON.stringify(body) });
+  return res.json();
+}
 
 /* ============================================================
-   FOLDER AUTO-SAVE — File System Access API (Chrome/Edge only).
-   Connect once per session; every saveData() call also rewrites
-   data.json and a regenerated index.html into that folder.
+   PUBLISH — writes index.html, data.json, tickets.json (created
+   once, never overwritten) and support-tickets.html to the repo,
+   and keeps a one-step-back backup of index.html for Revert.
    ============================================================ */
-var folderHandle = null;
-document.getElementById('connectFolderBtn').addEventListener('click', function(){
-  if (!('showDirectoryPicker' in window)){
-    alert('Folder auto-save uses the File System Access API, available in Chrome/Edge on desktop only. In other browsers, use "Generate site" to export manually instead.');
+var REVERT_KEY = 'kb_publish_backup_v1';
+
+function setRevertActive(active){
+  var btn = document.getElementById('revertBtn');
+  btn.disabled = !active;
+  btn.classList.toggle('is-active', active);
+}
+(function initRevertState(){
+  try{ setRevertActive(!!localStorage.getItem(REVERT_KEY)); }catch(e){ setRevertActive(false); }
+})();
+
+document.getElementById('exportBtn').addEventListener('click', async function publishToGitHub(){
+  var settings = GITHUB_SETTINGS;
+  if (!settings.owner || !settings.repo || !settings.path || !settings.branch || !GITHUB_TOKEN){
+    alert('GitHub publish settings are missing (owner/repo/path/branch/token). These are read from this browser\'s localStorage ("github_settings" and "github_token").');
     return;
   }
-  window.showDirectoryPicker().then(function(handle){
-    folderHandle = handle;
-    showToast('Folder connected — changes will auto-save here');
-    writeFolderFiles();
-  }).catch(function(err){
-    console.error(err);
-    alert('Could not connect a folder here. This is sometimes blocked inside an embedded preview — try opening this file in its own browser tab (not the chat preview) and connecting again.\n\n'+err.message);
-  });
+  try{
+    var html = buildStaticSite();
+
+    /* 1) back up the current index.html so Revert can restore it, THEN overwrite it */
+    var existing = await ghGetFile(settings.path);
+    if (existing && existing.content){
+      localStorage.setItem(REVERT_KEY, JSON.stringify({ path: settings.path, contentBase64: existing.content }));
+    }
+    var putResult = await ghPutFile(settings.path, html, 'Publish documentation', existing ? existing.sha : null);
+    if (putResult && putResult.content && putResult.content.sha){
+      var backup = JSON.parse(localStorage.getItem(REVERT_KEY) || '{}');
+      backup.newSha = putResult.content.sha;
+      localStorage.setItem(REVERT_KEY, JSON.stringify(backup));
+    }
+    setRevertActive(true);
+
+    /* 2) publish the raw data.json alongside it */
+    var dataPath = siblingPath('data.json');
+    var existingData = await ghGetFile(dataPath);
+    await ghPutFile(dataPath, JSON.stringify(data, null, 2), 'Publish knowledge base data', existingData ? existingData.sha : null);
+
+    /* 3) make sure tickets.json exists (never clobber submitted tickets) */
+    var ticketsPath = siblingPath('tickets.json');
+    var existingTickets = await ghGetFile(ticketsPath);
+    if (!existingTickets){
+      await ghPutFile(ticketsPath, JSON.stringify([], null, 2), 'Initialise support tickets store', null);
+    }
+
+    /* 4) (re)publish the support tickets admin page */
+    var ticketsHtml = buildSupportTicketsSite();
+    var ticketsPagePath = siblingPath('support-tickets.html');
+    var existingTicketsPage = await ghGetFile(ticketsPagePath);
+    await ghPutFile(ticketsPagePath, ticketsHtml, 'Publish support tickets page', existingTicketsPage ? existingTicketsPage.sha : null);
+
+    showToast('Published Successfully');
+  }catch(e){
+    console.error(e);
+    alert('Publish failed: '+e.message);
+  }
 });
-function writeFolderFiles(){
-  if (!folderHandle) return;
-  folderHandle.getFileHandle('data.json', {create:true}).then(function(fh){
-    return fh.createWritable().then(function(w){ return w.write(JSON.stringify(data,null,2)).then(function(){ return w.close(); }); });
-  }).catch(function(e){ console.error('data.json write failed', e); });
-  folderHandle.getFileHandle('index.html', {create:true}).then(function(fh){
-    return fh.createWritable().then(function(w){ return w.write(buildStaticSite()).then(function(){ return w.close(); }); });
-  }).catch(function(e){ console.error('index.html write failed', e); });
-}
 
-document.getElementById('exportBtn').addEventListener('click', async function publishToGitHub() {
-
-    const html = buildStaticSite();
-
-    const base64 = btoa(unescape(encodeURIComponent(html)));
-
-    const settings = GITHUB_SETTINGS;
-
-    const token = GITHUB_TOKEN;
-
-    const url =
-        `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${settings.path}?ref=${settings.branch}`;
-
-    const current = await fetch(url,{
-        headers:{
-            Authorization:`Bearer ${token}`,
-            Accept:"application/vnd.github+json"
-        }
-    });
-
-    const file = await current.json();
-
-    await fetch(url,{
-        method:"PUT",
-        headers:{
-            Authorization:`Bearer ${token}`,
-            Accept:"application/vnd.github+json",
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            message:"Publish documentation",
-            content:base64,
-            sha:file.sha,
-            branch:settings.branch
-        })
-    });
-
-    showToast("Published Successfully");
+document.getElementById('revertBtn').addEventListener('click', async function(){
+  var raw = localStorage.getItem(REVERT_KEY);
+  if (!raw) return;
+  var backup = JSON.parse(raw);
+  if (!confirm('Roll back "'+backup.path+'" to the version before your last publish?')) return;
+  try{
+    var current = await ghGetFile(backup.path);
+    var decoded = decodeURIComponent(escape(atob(backup.contentBase64.replace(/\n/g,''))));
+    await ghPutFile(backup.path, decoded, 'Revert to previous version', current ? current.sha : backup.newSha);
+    localStorage.removeItem(REVERT_KEY);
+    setRevertActive(false);
+    showToast('Reverted to previous version');
+  }catch(e){
+    console.error(e);
+    alert('Revert failed: '+e.message);
+  }
 });
 
 /* ============================================================
