@@ -216,6 +216,59 @@
   .ticket-success .ok-icon{width:52px;height:52px;border-radius:50%;background:#E5F2E3;color:#2F7A34;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.6rem;}
   .ticket-success p{font-size:.95rem;color:var(--text-main);margin:0 0 20px;}
   .ticket-close-btn{background:var(--ink);color:#fff;border:none;padding:9px 22px;border-radius:999px;font-size:.85rem;font-weight:700;cursor:pointer;}
+
+  /* ---------------- print (per-topic Print / Save as PDF) ---------------- */
+  .print-menu{position:relative;display:inline-flex;margin-left:8px;}
+  .print-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--paper-line);background:var(--paper-raised);border-radius:999px;cursor:pointer;color:var(--text-main);flex-shrink:0;}
+  .print-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
+  .print-btn svg{width:15px;height:15px;}
+  .print-dropdown{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--paper-raised);border:1px solid var(--paper-line);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.18);min-width:170px;z-index:60;overflow:hidden;}
+  .print-menu.is-open .print-dropdown{display:block;}
+  .print-dropdown button{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;padding:9px 12px;font-size:.83rem;text-align:left;cursor:pointer;color:var(--text-main);}
+  .print-dropdown button:hover{background:#F1ECE1;}
+  @media print{
+    .topbar,.sidebar,.rightbar,.site-footer,.sidebar-backdrop,.toast,.modal-overlay,.freeze-overlay,.print-menu,.fav-toggle,.breadcrumb{display:none !important;}
+    .kb-shell{display:block;min-height:0;}
+    .main{padding:0;max-width:100%;}
+  }
+
+  /* ---------------- confirm modal + freeze overlay (publish / revert) ---------------- */
+  .confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:4px;}
+  .confirm-btn{border:none;padding:9px 18px;border-radius:999px;font-size:.85rem;font-weight:700;cursor:pointer;}
+  .confirm-btn.no{background:#EFEAE0;color:var(--text-main);}
+  .confirm-btn.no:hover{background:#E7E2D8;}
+  .confirm-btn.yes{background:#B3261E;color:#fff;}
+  .confirm-btn.yes:hover{background:#8f1e18;}
+  .confirm-btn.yes.is-safe{background:var(--ink);}
+  .confirm-btn.yes.is-safe:hover{background:var(--ink-soft);}
+  .freeze-overlay{display:none;position:fixed;inset:0;background:rgba(20,18,15,.6);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+  .freeze-overlay.is-open{display:flex;}
+  .freeze-dots{display:flex;gap:8px;}
+  .freeze-dots span{width:12px;height:12px;border-radius:50%;background:var(--accent);animation:freezeBounce 1s infinite ease-in-out;}
+  .freeze-dots span:nth-child(2){animation-delay:.15s;}
+  .freeze-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes freezeBounce{0%,80%,100%{transform:scale(.6);opacity:.5;}40%{transform:scale(1);opacity:1;}}
+  .freeze-text{color:#fff;font-size:.9rem;font-weight:600;}
+  .toast.is-error{background:#B3261E;}
+
+  /* ---------------- topbar overflow menu (mobile) ---------------- */
+  .topbar-actions{display:flex;align-items:center;gap:12px;}
+  .topbar-more-btn{display:none;background:none;border:1px solid var(--ink-line);color:#fff;width:34px;height:34px;flex-shrink:0;border-radius:999px;font-size:1.15rem;line-height:1;cursor:pointer;}
+  .topbar-more-btn:hover{background:var(--ink-soft);}
+  @media (max-width:860px){
+    .search-wrap{max-width:none;}
+    .topbar-more-btn{display:inline-flex;align-items:center;justify-content:center;}
+    .topbar-actions{
+      display:none;position:absolute;top:62px;right:14px;
+      background:var(--ink);border:1px solid var(--ink-line);border-radius:10px;
+      padding:10px;flex-direction:column;align-items:stretch;gap:8px;
+      box-shadow:0 16px 40px rgba(0,0,0,.4);z-index:70;min-width:210px;
+    }
+    .topbar-actions.is-open{display:flex;}
+    .topbar-actions .mode-toggle{width:100%;justify-content:center;}
+    .topbar-actions .settings-btn{width:100%;border-radius:8px;}
+    .topbar-actions .revert-btn,.topbar-actions .export-btn,.topbar-actions .submit-request-btn--top{width:100%;border-radius:8px;text-align:center;}
+  }
 </style>
 </head>
 <body>
@@ -227,18 +280,21 @@
       <img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid">
       <div class="brand-text"><span class="brand-name">DOC STUDIO</span></div>
     </div>
-    <div class="mode-toggle">
-      <button id="btnPreview" class="active">Preview</button>
-      <button id="btnEdit">Edit</button>
-    </div>
     <div class="search-wrap" id="searchWrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
       <input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off">
       <div class="search-results" id="searchResults"></div>
     </div>
-    <button class="settings-btn" id="githubSettingsBtn" title="GitHub publish settings">⚙</button>
-    <button class="revert-btn" id="revertBtn" title="Roll back index.html to the version before your last publish" disabled>Revert Changes</button>
-    <button class="export-btn" id="exportBtn">Publish</button>
+    <button class="topbar-more-btn" id="topbarMoreBtn" title="More options" aria-label="More options" aria-haspopup="true">⋮</button>
+    <div class="topbar-actions" id="topbarActions">
+      <div class="mode-toggle">
+        <button id="btnPreview" class="active">Preview</button>
+        <button id="btnEdit">Edit</button>
+      </div>
+      <button class="settings-btn" id="githubSettingsBtn" title="GitHub publish settings">⚙</button>
+      <button class="revert-btn" id="revertBtn" title="Roll back index.html to the version before your last publish" disabled>Revert Changes</button>
+      <button class="export-btn" id="exportBtn">Publish</button>
+    </div>
   </header>
 
   <aside class="sidebar" id="sidebar">
@@ -278,6 +334,24 @@
 </div>
 
 <div class="toast hidden" id="toast">Saved</div>
+
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-head"><h2 id="confirmTitle">Are you sure?</h2><button class="modal-close" id="confirmCloseX">✕</button></div>
+    <div class="modal-body">
+      <p id="confirmMessage" style="margin:0 0 4px;font-size:.92rem;line-height:1.5;color:var(--text-main);"></p>
+      <div class="confirm-actions">
+        <button class="confirm-btn no" id="confirmNoBtn">No</button>
+        <button class="confirm-btn yes" id="confirmYesBtn">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="freeze-overlay" id="freezeOverlay" aria-live="polite">
+  <div class="freeze-dots"><span></span><span></span><span></span></div>
+  <div class="freeze-text" id="freezeText">Working…</div>
+</div>
 
 <div class="modal-overlay" id="ticketOverlay">
   <div class="modal-box">
@@ -406,11 +480,48 @@ function saveFavs(){
   storageSet(FAV_KEY, JSON.stringify(favourites));
 }
 
-function showToast(msg){
+function showToast(msg, isError){
   var t = document.getElementById('toast');
   t.textContent = msg; t.classList.remove('hidden');
+  t.classList.toggle('is-error', !!isError);
   clearTimeout(showToast._tm);
-  showToast._tm = setTimeout(function(){ t.classList.add('hidden'); }, 1800);
+  showToast._tm = setTimeout(function(){ t.classList.add('hidden'); }, isError ? 3200 : 1800);
+}
+
+/* Generic "Are you sure?" confirm modal, reused by Publish and Revert.
+   opts: {title, message, yesLabel, safe}. onYes runs only if the user
+   confirms; nothing happens on No / close / outside click. */
+function confirmAction(opts, onYes){
+  var overlay = document.getElementById('confirmOverlay');
+  document.getElementById('confirmTitle').textContent = opts.title || 'Are you sure?';
+  document.getElementById('confirmMessage').textContent = opts.message || '';
+  var yesBtn = document.getElementById('confirmYesBtn');
+  var noBtn = document.getElementById('confirmNoBtn');
+  var closeX = document.getElementById('confirmCloseX');
+  yesBtn.textContent = opts.yesLabel || 'Yes';
+  yesBtn.className = 'confirm-btn yes' + (opts.safe ? ' is-safe' : '');
+  overlay.classList.add('is-open');
+  function cleanup(){
+    overlay.classList.remove('is-open');
+    yesBtn.removeEventListener('click', onYesClick);
+    noBtn.removeEventListener('click', onNoClick);
+    closeX.removeEventListener('click', onNoClick);
+    overlay.removeEventListener('click', onOverlayClick);
+  }
+  function onYesClick(){ cleanup(); onYes(); }
+  function onNoClick(){ cleanup(); }
+  function onOverlayClick(e){ if (e.target === overlay) onNoClick(); }
+  yesBtn.addEventListener('click', onYesClick);
+  noBtn.addEventListener('click', onNoClick);
+  closeX.addEventListener('click', onNoClick);
+  overlay.addEventListener('click', onOverlayClick);
+}
+function showFreeze(text){
+  document.getElementById('freezeText').textContent = text || 'Working…';
+  document.getElementById('freezeOverlay').classList.add('is-open');
+}
+function hideFreeze(){
+  document.getElementById('freezeOverlay').classList.remove('is-open');
 }
 
 /* ---------- data helpers ---------- */
@@ -618,6 +729,48 @@ function blockToHtml(b){
 }
 
 /* ============================================================
+   PRINT — printer-icon dropdown (Save as PDF / Print) shown on
+   every topic. "Save as PDF" reuses the browser print dialog
+   (choose "Save as PDF" as the destination) since that needs no
+   extra library and works the same in the exported static site.
+   ============================================================ */
+var PRINT_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
+function printMenuHtml(){
+  return '<div class="print-menu" id="printMenu">'+
+    '<button type="button" class="print-btn" id="printBtn" title="Print or save as PDF" aria-haspopup="true">'+PRINT_ICON_SVG+'</button>'+
+    '<div class="print-dropdown" id="printDropdown">'+
+      '<button type="button" data-print-action="pdf">⬇ Save as PDF</button>'+
+      '<button type="button" data-print-action="print">🖨 Print</button>'+
+    '</div></div>';
+}
+function bindPrintMenu(topicTitle){
+  var menu = document.getElementById('printMenu');
+  var btn = document.getElementById('printBtn');
+  if (!menu || !btn) return;
+  btn.addEventListener('click', function(e){ e.stopPropagation(); menu.classList.toggle('is-open'); });
+  menu.querySelectorAll('[data-print-action]').forEach(function(b){
+    b.addEventListener('click', function(){
+      menu.classList.remove('is-open');
+      var prevTitle = document.title;
+      document.title = topicTitle || prevTitle;
+      var restored = false;
+      function restore(){ if (restored) return; restored = true; document.title = prevTitle; window.removeEventListener('afterprint', restore); }
+      window.addEventListener('afterprint', restore);
+      setTimeout(restore, 5000);
+      window.print();
+    });
+  });
+}
+/* Close any open print / topbar-overflow menu on an outside click.
+   Bound once here (not inside render functions) so it never piles up. */
+document.addEventListener('click', function(e){
+  var pm = document.getElementById('printMenu');
+  if (pm && pm.classList.contains('is-open') && !pm.contains(e.target)) pm.classList.remove('is-open');
+  var ta = document.getElementById('topbarActions'), tb = document.getElementById('topbarMoreBtn');
+  if (ta && ta.classList.contains('is-open') && !ta.contains(e.target) && e.target !== tb) ta.classList.remove('is-open');
+});
+
+/* ============================================================
    MAIN AREA — preview article / history / editor
    ============================================================ */
 function renderMain(){
@@ -639,9 +792,12 @@ function renderArticle(main){
     '<div class="article-kicker">'+escapeHtml(prod.name)+' — '+escapeHtml(sec.title)+'</div>'+
     '<h1 class="article-title">'+escapeHtml(t.title)+'</h1>'+
     '<div class="article-meta"><span>Last updated '+escapeHtml(t.updated||today())+'</span>'+
-      '<button class="fav-toggle'+(isFav?' is-fav':'')+'" id="favToggleBtn">★ '+(isFav?'Saved to favourites':'Add to favourites')+'</button></div>'+
+      '<button class="fav-toggle'+(isFav?' is-fav':'')+'" id="favToggleBtn">★ '+(isFav?'Saved to favourites':'Add to favourites')+'</button>'+
+      printMenuHtml()+
+    '</div>'+
     '<div class="article-body">'+ (t.blocks||[]).map(blockToHtml).join('') + '</div>';
   document.getElementById('favToggleBtn').addEventListener('click', function(){ toggleFav(t.id); renderArticle(main); });
+  bindPrintMenu(t.title);
 }
 
 function logChange(tag, product, text, details){
@@ -900,14 +1056,38 @@ document.getElementById('historyLink').addEventListener('click', function(e){
   renderMain();
 });
 
-/* Collapsible right (favourites) sidebar */
+/* Collapsible right (favourites) sidebar — state persists across visits */
 (function(){
   var rb = document.getElementById('rightbar');
   var btn = document.getElementById('rightbarToggle');
-  btn.addEventListener('click', function(){
-    var collapsed = rb.classList.toggle('collapsed');
+  var collapsed = false;
+  try{ collapsed = localStorage.getItem('kb_rightbar_collapsed')==='1'; }catch(e){}
+  function apply(){
+    rb.classList.toggle('collapsed', collapsed);
     btn.textContent = collapsed ? '‹' : '›';
     btn.title = collapsed ? 'Expand' : 'Collapse';
+    btn.setAttribute('aria-expanded', String(!collapsed));
+  }
+  apply();
+  btn.addEventListener('click', function(){
+    collapsed = !collapsed;
+    apply();
+    try{ localStorage.setItem('kb_rightbar_collapsed', collapsed ? '1' : '0'); }catch(e){}
+  });
+})();
+
+/* Mobile topbar overflow — collapses Preview/Edit, Settings, Revert
+   and Publish into a "⋮" dropdown so only search stays on the bar. */
+(function(){
+  var moreBtn = document.getElementById('topbarMoreBtn');
+  var actions = document.getElementById('topbarActions');
+  if (!moreBtn || !actions) return;
+  moreBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    actions.classList.toggle('is-open');
+  });
+  actions.addEventListener('click', function(e){
+    if (e.target.closest('button')) actions.classList.remove('is-open');
   });
 })();
 
@@ -970,6 +1150,7 @@ function supportTicketsRuntimeJs(){
         });
       });
     }
+    var ticketsPath = siblingPath('tickets.json');
     var currentSha = null;
     function statusLabel(s){ return s==='in-progress' ? 'In Progress' : s==='resolved' ? 'Resolved' : 'Open'; }
     function render(list){
@@ -1171,7 +1352,8 @@ function buildStaticSite(){
         '<div class="brand-text"><span class="brand-name"> SUPPORT</span></div></div>' +
         '<div class="search-wrap" id="searchWrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>' +
         '<input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off"><div class="search-results" id="searchResults"></div></div>' +
-        '<button class="submit-request-btn submit-request-btn--top" id="submitRequestBtn">✉ Submit a Request</button></header>' +
+        '<button class="topbar-more-btn" id="topbarMoreBtn" title="More options" aria-label="More options" aria-haspopup="true">⋮</button>' +
+        '<div class="topbar-actions" id="topbarActions"><button class="submit-request-btn submit-request-btn--top" id="submitRequestBtn">Submit Request</button></div></header>' +
       '<aside class="sidebar" id="sidebar"><div class="sidebar-section"><div class="sidebar-heading"><span>Product</span></div>' +
         '<select class="product-select" id="productSelect"></select></div>' +
         '<div class="sidebar-section" style="flex:1;"><div class="sidebar-heading"><span id="docsHeading">Documentation</span></div>' +
@@ -1237,6 +1419,38 @@ function exportRuntimeJs(){
       if (b.type==='code'){return '<pre><code>'+esc(b.text||'')+'</code></pre>';}
       return '';
     }
+    var PRINT_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
+    function printMenuHtml(){
+      return '<div class="print-menu" id="printMenu">'+
+        '<button type="button" class="print-btn" id="printBtn" title="Print or save as PDF" aria-haspopup="true">'+PRINT_ICON_SVG+'</button>'+
+        '<div class="print-dropdown" id="printDropdown">'+
+          '<button type="button" data-print-action="pdf">⬇ Save as PDF</button>'+
+          '<button type="button" data-print-action="print">🖨 Print</button>'+
+        '</div></div>';
+    }
+    function bindPrintMenu(topicTitle){
+      var menu=document.getElementById('printMenu'), btn=document.getElementById('printBtn');
+      if (!menu || !btn) return;
+      btn.addEventListener('click', function(e){ e.stopPropagation(); menu.classList.toggle('is-open'); });
+      menu.querySelectorAll('[data-print-action]').forEach(function(b){
+        b.addEventListener('click', function(){
+          menu.classList.remove('is-open');
+          var prevTitle=document.title;
+          document.title = topicTitle || prevTitle;
+          var restored=false;
+          function restore(){ if(restored) return; restored=true; document.title=prevTitle; window.removeEventListener('afterprint', restore); }
+          window.addEventListener('afterprint', restore);
+          setTimeout(restore, 5000);
+          window.print();
+        });
+      });
+    }
+    document.addEventListener('click', function(e){
+      var pm=document.getElementById('printMenu');
+      if (pm && pm.classList.contains('is-open') && !pm.contains(e.target)) pm.classList.remove('is-open');
+      var ta=document.getElementById('topbarActions'), tb=document.getElementById('topbarMoreBtn');
+      if (ta && ta.classList.contains('is-open') && !ta.contains(e.target) && e.target!==tb) ta.classList.remove('is-open');
+    });
     var currentProductId = data.products[0] ? data.products[0].id : null;
     var articleId = null;
     function renderProductSelect(){
@@ -1297,9 +1511,12 @@ function exportRuntimeJs(){
         '<div class="article-kicker">'+esc(prod.name)+' — '+esc(sec.title)+'</div>'+
         '<h1 class="article-title">'+esc(t.title)+'</h1>'+
         '<div class="article-meta"><span>Last updated '+esc(t.updated||'')+'</span>'+
-        '<button class="fav-toggle'+(isFav?' is-fav':'')+'" id="favToggleBtn">★ '+(isFav?'Saved to favourites':'Add to favourites')+'</button></div>'+
+        '<button class="fav-toggle'+(isFav?' is-fav':'')+'" id="favToggleBtn">★ '+(isFav?'Saved to favourites':'Add to favourites')+'</button>'+
+        printMenuHtml()+
+        '</div>'+
         '<div class="article-body">'+(t.blocks||[]).map(blockToHtml).join('')+'</div>';
       document.getElementById('favToggleBtn').addEventListener('click',function(){toggleFav(t.id);renderArticle(main);});
+      bindPrintMenu(t.title);
     }
     function buildIdx(){var idx=[];data.topics.forEach(function(t){var sec=getSection(t.sectionId);if(!sec)return;var prod=getProduct(sec.productId);if(!prod)return;idx.push({id:t.id,title:t.title,path:prod.name+' › '+sec.title});});return idx;}
     var wrap=document.getElementById('searchWrap'),input=document.getElementById('kbSearch'),results=document.getElementById('searchResults');
@@ -1328,11 +1545,26 @@ function exportRuntimeJs(){
     })();
     (function(){
       var rb=document.getElementById('rightbar'), btn=document.getElementById('rightbarToggle');
-      btn.addEventListener('click',function(){
-        var collapsed=rb.classList.toggle('collapsed');
+      var collapsed=false;
+      try{ collapsed = localStorage.getItem('kb_rightbar_collapsed')==='1'; }catch(e){}
+      function apply(){
+        rb.classList.toggle('collapsed', collapsed);
         btn.textContent=collapsed?'‹':'›';
         btn.title=collapsed?'Expand':'Collapse';
+        btn.setAttribute('aria-expanded', String(!collapsed));
+      }
+      apply();
+      btn.addEventListener('click',function(){
+        collapsed=!collapsed;
+        apply();
+        try{ localStorage.setItem('kb_rightbar_collapsed', collapsed?'1':'0'); }catch(e){}
       });
+    })();
+    (function(){
+      var moreBtn=document.getElementById('topbarMoreBtn'), actions=document.getElementById('topbarActions');
+      if (!moreBtn || !actions) return;
+      moreBtn.addEventListener('click', function(e){ e.stopPropagation(); actions.classList.toggle('is-open'); });
+      actions.addEventListener('click', function(e){ if (e.target.closest('button')) actions.classList.remove('is-open'); });
     })();
     /* ---------- Submit a Request (ticket) modal ---------- */
     (function(){
@@ -1479,13 +1711,23 @@ function setRevertActive(active){
   try{ setRevertActive(!!localStorage.getItem(REVERT_KEY)); }catch(e){ setRevertActive(false); }
 })();
 
-document.getElementById('exportBtn').addEventListener('click', async function publishToGitHub(){
+document.getElementById('exportBtn').addEventListener('click', function publishToGitHub(){
   var settings = GITHUB_SETTINGS;
   if (!settings.owner || !settings.repo || !settings.path || !settings.branch || !GITHUB_TOKEN){
     showToast('Add your GitHub publish settings first');
     openGithubSettingsModal();
     return;
   }
+  confirmAction({
+    title: 'Publish edits?',
+    message: 'Are you sure to publish edits?',
+    yesLabel: 'Yes, publish'
+  }, doPublish);
+});
+
+async function doPublish(){
+  var settings = GITHUB_SETTINGS;
+  showFreeze('Publishing…');
   try{
     var html = buildStaticSite();
 
@@ -1520,30 +1762,42 @@ document.getElementById('exportBtn').addEventListener('click', async function pu
     var existingTicketsPage = await ghGetFile(ticketsPagePath);
     await ghPutFile(ticketsPagePath, ticketsHtml, 'Publish support tickets page', existingTicketsPage ? existingTicketsPage.sha : null);
 
+    hideFreeze();
     showToast('Published Successfully');
   }catch(e){
     console.error(e);
-    alert('Publish failed: '+e.message);
+    hideFreeze();
+    showToast('Publish failed: '+e.message, true);
   }
-});
+}
 
-document.getElementById('revertBtn').addEventListener('click', async function(){
+document.getElementById('revertBtn').addEventListener('click', function(){
   var raw = localStorage.getItem(REVERT_KEY);
   if (!raw) return;
+  confirmAction({
+    title: 'Revert changes?',
+    message: 'Your content will be replaced with previous version and cannot be undone.',
+    yesLabel: 'Yes, revert'
+  }, function(){ doRevert(raw); });
+});
+
+async function doRevert(raw){
   var backup = JSON.parse(raw);
-  if (!confirm('Roll back "'+backup.path+'" to the version before your last publish?')) return;
+  showFreeze('Reverting…');
   try{
     var current = await ghGetFile(backup.path);
     var decoded = decodeURIComponent(escape(atob(backup.contentBase64.replace(/\n/g,''))));
     await ghPutFile(backup.path, decoded, 'Revert to previous version', current ? current.sha : backup.newSha);
     localStorage.removeItem(REVERT_KEY);
     setRevertActive(false);
+    hideFreeze();
     showToast('Reverted to previous version');
   }catch(e){
     console.error(e);
-    alert('Revert failed: '+e.message);
+    hideFreeze();
+    showToast('Revert failed: '+e.message, true);
   }
-});
+}
 
 /* ============================================================
    INIT
