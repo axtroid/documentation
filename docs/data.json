@@ -1,111 +1,46 @@
 {
   "products": [
     {
-      "id": "prod_uuj73wy",
-      "name": "Akaar E1",
-      "category": "3D Printers"
-    },
-    {
-      "id": "prod_jm56quw",
-      "name": "Akaar L1",
-      "category": "3D Printers"
+      "id": "prod_1756sym",
+      "name": "Sample Product",
+      "category": "General"
     }
   ],
   "sections": [
     {
-      "id": "sec_2n92vbf",
-      "productId": "prod_uuj73wy",
+      "id": "sec_xa8vjm0",
+      "productId": "prod_1756sym",
       "title": "Getting Started",
       "order": 0
-    },
-    {
-      "id": "sec_8l3abax",
-      "productId": "prod_uuj73wy",
-      "title": "Manuals",
-      "order": 1
     }
   ],
   "topics": [
     {
-      "id": "top_7045ebn",
-      "sectionId": "sec_2n92vbf",
+      "id": "top_opxfhaz",
+      "sectionId": "sec_xa8vjm0",
       "title": "Quick Start Guide",
       "order": 0,
       "updated": "25 Jul 2026",
       "blocks": [
         {
-          "id": "blk_b65ztqe",
+          "id": "blk_5etdfui",
           "type": "paragraph",
-          "html": "This document"
+          "html": "Replace this with your own content — add headings, images, callouts and lists using the toolbar below."
         },
         {
-          "id": "blk_hgk3njw",
+          "id": "blk_ls7hpj6",
           "type": "callout",
           "calloutType": "tip",
-          "html": "This document"
+          "html": "Use the <b>Edit</b> toggle at the top to author topics, then <b>Generate site</b> to export a standalone HTML file."
         }
       ]
-    },
-    {
-      "id": "top_vlre25o",
-      "sectionId": "sec_8l3abax",
-      "title": "User Manual",
-      "order": 0,
-      "updated": "25 Jul 2026",
-      "blocks": []
     }
   ],
   "changelog": [
     {
       "date": "25 Jul 2026",
-      "tag": "added",
-      "product": "Akaar E1",
-      "text": "User Manual",
-      "details": [
-        "User Manual"
-      ]
-    },
-    {
-      "date": "25 Jul 2026",
-      "tag": "removed",
-      "product": "Akaar E1",
-      "text": "Deleted topic \"User Manual\".",
-      "details": [
-        "Deleted topic \"User Manual\"."
-      ]
-    },
-    {
-      "date": "25 Jul 2026",
-      "tag": "added",
-      "product": "Akaar E1",
-      "text": "User Manual",
-      "details": [
-        "User Manual"
-      ]
-    },
-    {
-      "date": "25 Jul 2026",
       "tag": "updated",
-      "product": "Akaar E1",
-      "text": "\"Quick Start Guide\" updated",
-      "details": [
-        "No visible content change."
-      ]
-    },
-    {
-      "date": "25 Jul 2026",
-      "tag": "updated",
-      "product": "Akaar E1",
-      "text": "\"Quick Start Guide\" updated",
-      "details": [
-        "paragraph edited: \"Replace this with your own content — add headings, images, c…\" → \"This document\"",
-        "callout edited: \"Use the Edit toggle at the top to author topics, then Genera…\" → \"This document\""
-      ]
-    },
-    {
-      "date": "25 Jul 2026",
-      "tag": "updated",
-      "product": "Akaar E1",
+      "product": "Sample Product",
       "text": "\"Quick Start Guide\" updated",
       "details": [
         "No visible content change."
