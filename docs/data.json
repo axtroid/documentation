@@ -4,6 +4,11 @@
       "id": "prod_uuj73wy",
       "name": "Akaar E1",
       "category": "3D Printers"
+    },
+    {
+      "id": "prod_jm56quw",
+      "name": "Akaar L1",
+      "category": "3D Printers"
     }
   ],
   "sections": [
@@ -12,6 +17,12 @@
       "productId": "prod_uuj73wy",
       "title": "Getting Started",
       "order": 0
+    },
+    {
+      "id": "sec_8l3abax",
+      "productId": "prod_uuj73wy",
+      "title": "Manuals",
+      "order": 1
     }
   ],
   "topics": [
@@ -34,9 +45,44 @@
           "html": "This document"
         }
       ]
+    },
+    {
+      "id": "top_vlre25o",
+      "sectionId": "sec_8l3abax",
+      "title": "User Manual",
+      "order": 0,
+      "updated": "25 Jul 2026",
+      "blocks": []
     }
   ],
   "changelog": [
+    {
+      "date": "25 Jul 2026",
+      "tag": "added",
+      "product": "Akaar E1",
+      "text": "User Manual",
+      "details": [
+        "User Manual"
+      ]
+    },
+    {
+      "date": "25 Jul 2026",
+      "tag": "removed",
+      "product": "Akaar E1",
+      "text": "Deleted topic \"User Manual\".",
+      "details": [
+        "Deleted topic \"User Manual\"."
+      ]
+    },
+    {
+      "date": "25 Jul 2026",
+      "tag": "added",
+      "product": "Akaar E1",
+      "text": "User Manual",
+      "details": [
+        "User Manual"
+      ]
+    },
     {
       "date": "25 Jul 2026",
       "tag": "updated",
