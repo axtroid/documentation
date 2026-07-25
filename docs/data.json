@@ -20,13 +20,13 @@
       "sectionId": "sec_p6yauaz",
       "title": "Quick Start Guide",
       "order": 0,
-      "updated": "24 Jul 2026",
+      "updated": "25 Jul 2026",
       "blocks": [
         {
           "id": "blk_iobu70b",
           "type": "heading",
           "level": 2,
-          "html": "Before you begin:"
+          "html": "Ilovekarishma"
         },
         {
           "id": "blk_znnqh46",
@@ -76,6 +76,15 @@
     }
   ],
   "changelog": [
+    {
+      "date": "25 Jul 2026",
+      "tag": "updated",
+      "product": "Akaar E1",
+      "text": "\"Quick Start Guide\" updated",
+      "details": [
+        "heading edited: \"Before you begin:\" → \"Ilovekarishma\""
+      ]
+    },
     {
       "date": "24 Jul 2026",
       "tag": "updated",
