@@ -31,13 +31,12 @@
       "sectionId": "sec_pwnzb60",
       "title": "Quick Start Guide",
       "order": 0,
-      "updated": "25 Jul 2026",
+      "updated": "26 Jul 2026",
       "blocks": [
         {
-          "id": "blk_7daii83",
-          "type": "heading",
-          "level": 2,
-          "html": "Thanks"
+          "id": "blk_avkwx94",
+          "type": "paragraph",
+          "html": "Welcome to Akaar E1<div>This product provides seamless printing with in-built auto-calibration and filament purging capabilities.</div>"
         },
         {
           "id": "blk_5dt4yrb",
@@ -77,6 +76,16 @@
     }
   ],
   "changelog": [
+    {
+      "date": "26 Jul 2026",
+      "tag": "updated",
+      "product": "Akaar E1",
+      "text": "\"Quick Start Guide\" updated",
+      "details": [
+        "paragraph added: \"Welcome to Akaar E1This product provides seamless printing with in-built auto-ca…\"",
+        "heading removed: \"Thanks\""
+      ]
+    },
     {
       "date": "25 Jul 2026",
       "tag": "updated",
