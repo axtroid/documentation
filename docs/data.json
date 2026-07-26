@@ -2,8 +2,8 @@
   "products": [
     {
       "id": "prod_0qsqwat",
-      "name": "Vyra S1",
-      "category": "VR"
+      "name": "Akaar L1",
+      "category": "3D Printers"
     },
     {
       "id": "prod_t601we5",
@@ -31,7 +31,7 @@
       "sectionId": "sec_pwnzb60",
       "title": "Quick Start Guide",
       "order": 0,
-      "updated": "24 Jul 2026",
+      "updated": "25 Jul 2026",
       "blocks": [
         {
           "id": "blk_7daii83",
@@ -77,6 +77,24 @@
     }
   ],
   "changelog": [
+    {
+      "date": "25 Jul 2026",
+      "tag": "updated",
+      "product": "Akaar E1",
+      "text": "\"Quick Start Guide\" updated",
+      "details": [
+        "No visible content change."
+      ]
+    },
+    {
+      "date": "25 Jul 2026",
+      "tag": "updated",
+      "product": "Akaar E1",
+      "text": "\"Quick Start Guide\" updated",
+      "details": [
+        "No visible content change."
+      ]
+    },
     {
       "date": "24 Jul 2026",
       "tag": "updated",
