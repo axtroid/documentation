@@ -13,24 +13,26 @@
     --sidebar-w:220px; --rightbar-w:260px; --rightbar-w-collapsed:48px;
   }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:var(--font-body);color:var(--text-main);background:var(--paper);-webkit-font-smoothing:antialiased;}
+  html{overflow-x:hidden;width:100%;}
+  body{margin:0;font-family:var(--font-body);color:var(--text-main);background:var(--paper);-webkit-font-smoothing:antialiased;overflow-x:hidden;width:100%;max-width:100%;}
   a{color:inherit;text-decoration:none;}
   button{font-family:inherit;}
   ::selection{background:var(--gold-soft);}
 
-  .kb-shell{display:grid;grid-template-columns:var(--sidebar-w) 1fr auto;grid-template-rows:auto 1fr auto;grid-template-areas:"topbar topbar topbar" "sidebar main rightbar" "footer footer footer";min-height:100vh;}
+  .kb-shell{display:grid;grid-template-columns:var(--sidebar-w) 1fr auto;grid-template-rows:auto 1fr auto;grid-template-areas:"topbar topbar topbar" "sidebar main rightbar" "footer footer footer";min-height:100vh;min-height:100dvh;max-width:100vw;overflow-x:hidden;}
 
   /* topbar */
   .topbar{grid-area:topbar;background:var(--ink);border-bottom:1px solid var(--ink-line);display:flex;align-items:center;gap:18px;padding:0 22px;height:62px;position:sticky;top:0;z-index:40;}
   .brand{display:flex;align-items:center;gap:10px;color:#fff;white-space:nowrap;font-family:var(--font-display);font-weight:700;font-size:1.05rem;}
   .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
   .brand-logo{height:48px;width:auto;display:block;flex-shrink:0;}
+  .brand-logo-mobile{display:none;}
   .brand-text{display:flex;flex-direction:column;line-height:2.15;}
   .brand-name{font-family:var(--font-display);font-weight:700;font-size:1.52rem;color:var(--accent);}
   .brand-sub{font-size:.68rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#fff;}
   .hamburger-btn{display:none;background:none;border:none;color:#fff;font-size:1.35rem;line-height:1;cursor:pointer;padding:4px 8px;margin-right:2px;border-radius:6px;}
   .hamburger-btn:hover{background:var(--ink-soft);}
-  .site-footer{grid-area:footer;background:var(--ink);color:var(--sidebar-text-dim);text-align:center;font-size:.78rem;padding:12px 20px;border-top:1px solid var(--ink-line);}
+  .site-footer{grid-area:footer;background:var(--ink);color:var(--sidebar-text-dim);text-align:center;font-size:.78rem;padding:14px 20px;border-top:1px solid var(--ink-line);}
   .site-footer a{color:var(--accent);}
   .sidebar-backdrop{display:none;}
   .mode-toggle{display:flex;background:var(--ink-soft);border:1px solid var(--ink-line);border-radius:999px;padding:3px;gap:2px;}
@@ -51,7 +53,8 @@
   .export-btn:hover{background:var(--gold);}
 
   /* sidebar */
-  .sidebar{grid-area:sidebar;background:var(--ink);color:var(--sidebar-text);border-right:1px solid var(--ink-line);display:flex;flex-direction:column;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;}
+  .sidebar{grid-area:sidebar;background:var(--ink);color:var(--sidebar-text);border-right:1px solid var(--ink-line);display:flex;flex-direction:column;align-self:stretch;height:100%;}
+  .sidebar-inner{display:flex;flex-direction:column;flex:1;position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100dvh - 62px);overflow-y:auto;}
   .sidebar-section{padding:16px 14px 6px;}
   .sidebar-section + .sidebar-section{border-top:1px solid var(--ink-line);}
   .sidebar-heading{display:flex;align-items:center;justify-content:space-between;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sidebar-text-dim);font-weight:700;margin-bottom:8px;padding:0 4px;}
@@ -77,11 +80,12 @@
   .sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--ink-line);text-align:center;font-size:.72rem;color:var(--sidebar-text-dim);}
 
   /* rightbar */
-  .rightbar{grid-area:rightbar;background:var(--paper-raised);border-left:1px solid var(--paper-line);padding:0;position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;overflow-x:hidden;transition:width .18s ease;width:var(--rightbar-w);flex-shrink:0;}
-  .rightbar-toggle{position:sticky;top:0;display:flex;align-items:center;justify-content:center;width:100%;height:30px;background:none;border:none;border-bottom:1px solid var(--paper-line);color:var(--text-muted);cursor:pointer;font-size:.85rem;z-index:2;}
+  .rightbar{grid-area:rightbar;background:var(--paper-raised);border-left:1px solid var(--paper-line);padding:0;position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100dvh - 62px);overflow:visible;transition:width .18s ease;width:var(--rightbar-w);flex-shrink:0;}
+  .rightbar-body{height:100%;overflow-y:auto;overflow-x:hidden;}
+  .rightbar-toggle{position:absolute;top:50%;left:-13px;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:26px;height:56px;background:var(--paper-raised);border:1px solid var(--paper-line);border-right:none;border-radius:8px 0 0 8px;color:var(--text-muted);cursor:pointer;font-size:.85rem;box-shadow:-2px 2px 8px rgba(0,0,0,.1);z-index:5;}
   .rightbar-toggle:hover{background:#F1ECE1;color:var(--ink);}
   .rightbar.collapsed{width:var(--rightbar-w-collapsed);}
-  .rightbar.collapsed .rightbar-section{display:none;}
+  .rightbar.collapsed .rightbar-body{display:none;}
   .rightbar-section{padding:16px 14px 6px;}
   .rightbar-section + .rightbar-section{border-top:1px solid var(--paper-line);}
   .rightbar-heading{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin-bottom:8px;padding:0 4px;}
@@ -114,6 +118,12 @@
   .article-body figure{margin:20px 0;}
   .article-body img{display:block;max-width:100%;height:auto;border-radius:var(--radius);border:1px solid var(--paper-line);}
   .article-body figcaption{margin-top:6px;font-size:.78rem;color:var(--text-muted);text-align:center;}
+  .topic-feedback{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:36px 0 8px;padding:14px 16px;border:1px solid var(--paper-line);border-radius:var(--radius);background:#FBF9F5;font-size:.88rem;color:var(--text-main);}
+  .topic-feedback-buttons{display:flex;gap:8px;}
+  .feedback-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--paper-line);background:var(--paper-raised);padding:6px 14px;border-radius:999px;font-size:.85rem;cursor:pointer;color:var(--text-main);}
+  .feedback-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
+  .feedback-btn.is-picked{background:var(--gold-soft);border-color:var(--gold);color:#8A6416;}
+  .topic-feedback.is-answered .topic-feedback-question{color:var(--text-muted);}
   .callout{display:flex;gap:12px;border-left:3px solid var(--accent);background:#FBF1E1;padding:13px 16px;border-radius:0 var(--radius) var(--radius) 0;margin:18px 0;font-size:.92rem;}
   .callout-icon{width:18px;height:18px;flex-shrink:0;margin-top:1px;}
   .callout-title{font-weight:700;margin-bottom:3px;}
@@ -133,16 +143,31 @@
   @media (max-width:860px){
     .kb-shell{grid-template-columns:1fr;grid-template-areas:"topbar" "main" "footer";}
     .hamburger-btn{display:inline-flex;align-items:center;}
+    .topbar{padding:0 14px;gap:8px;}
+    .brand{min-width:0;gap:6px;}
+    .brand-logo{display:none;}
+    .brand-logo-mobile{display:block;height:30px;}
+    .brand-name{font-size:1.2rem;}
+    .search-wrap{min-width:0;flex:1 1 auto;}
+    .search-wrap input{padding-left:30px;}
     .sidebar{
       display:flex;position:fixed;top:62px;left:0;bottom:0;width:82vw;max-width:320px;
       transform:translateX(-100%);transition:transform .22s ease;z-index:55;
-      box-shadow:4px 0 28px rgba(0,0,0,.4);
+      box-shadow:4px 0 28px rgba(0,0,0,.4);height:auto;
     }
+    .sidebar-inner{position:static;height:100%;flex:1;}
     .kb-shell.sidebar-open .sidebar{transform:translateX(0);}
     .kb-shell.sidebar-open .sidebar-backdrop{display:block;position:fixed;top:62px;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:50;}
-    .main{padding:24px 18px 60px;}
+    .main{padding:24px 18px 60px;max-width:100vw;}
     .brand-sub{display:none;}
+    .topic-feedback{flex-direction:column;align-items:flex-start;}
+    .article-meta{padding-right:2px;}
+    .fav-toggle{margin-right:8px;}
+    .print-menu{margin-left:0;margin-right:2px;}
   }
+  /* keep any long words, URLs, or tables from forcing horizontal scroll on narrow screens */
+  .main, .article-body{max-width:100%;overflow-wrap:anywhere;word-break:break-word;}
+  .article-body table{display:block;max-width:100%;overflow-x:auto;}
 
   /* revert button (kept outside the editor-only block above so it also
      survives into the published static site's stylesheet) */
@@ -221,23 +246,35 @@
   .topbar-actions{display:flex;align-items:center;gap:12px;}
   .topbar-more-btn{display:none;background:none;border:1px solid var(--ink-line);color:#fff;width:34px;height:34px;flex-shrink:0;border-radius:999px;font-size:1.15rem;line-height:1;cursor:pointer;}
   .topbar-more-btn:hover{background:var(--ink-soft);}
+  .topbar-actions-backdrop{display:none;}
   @media (max-width:860px){
     .search-wrap{max-width:none;}
     .topbar-more-btn{display:inline-flex;align-items:center;justify-content:center;}
     .topbar-actions{
-      display:none;position:absolute;top:62px;right:14px;
-      background:var(--ink);border:1px solid var(--ink-line);border-radius:10px;
-      padding:10px;flex-direction:column;align-items:stretch;gap:8px;
-      box-shadow:0 16px 40px rgba(0,0,0,.4);z-index:70;min-width:210px;
+      display:none;position:fixed;top:auto;left:0;right:0;bottom:0;
+      background:var(--ink);border:1px solid var(--ink-line);border-bottom:none;
+      border-radius:16px 16px 0 0;
+      padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));
+      flex-direction:column;align-items:stretch;gap:8px;
+      box-shadow:0 -12px 40px rgba(0,0,0,.45);z-index:120;min-width:0;
+      max-height:70vh;overflow-y:auto;
+    }
+    .topbar-actions::before{
+      content:'';display:block;width:36px;height:4px;border-radius:999px;
+      background:var(--ink-line);margin:2px auto 10px;
     }
     .topbar-actions.is-open{display:flex;}
+    .topbar-actions.is-open ~ .topbar-actions-backdrop{
+      display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:110;
+    }
     .topbar-actions .mode-toggle{width:100%;justify-content:center;}
     .topbar-actions .settings-btn{width:100%;border-radius:8px;}
     .topbar-actions .revert-btn,.topbar-actions .export-btn,.topbar-actions .submit-request-btn--top{width:100%;border-radius:8px;text-align:center;}
   }
 
-.mode-toggle,.export-btn,#addProductBtn,.add-btn,.row-actions .icon-sm,.revert-btn{display:none !important;}</style></head><body><div class="kb-shell" id="kbShell"><header class="topbar"><button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button><div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid"><div class="brand-text"><span class="brand-name"> SUPPORT</span></div></div><div class="search-wrap" id="searchWrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off"><div class="search-results" id="searchResults"></div></div><button class="topbar-more-btn" id="topbarMoreBtn" title="More options" aria-label="More options" aria-haspopup="true">⋮</button><div class="topbar-actions" id="topbarActions"><button class="submit-request-btn submit-request-btn--top" id="submitRequestBtn">Submit Request</button></div></header><aside class="sidebar" id="sidebar"><div class="sidebar-section"><div class="sidebar-heading"><span>Product</span></div><select class="product-select" id="productSelect"></select></div><div class="sidebar-section" style="flex:1;"><div class="sidebar-heading"><span id="docsHeading">Documentation</span></div><ul class="nav-tree" id="navTree"></ul></div></aside><aside class="rightbar" id="rightbar"><button class="rightbar-toggle" id="rightbarToggle" title="Collapse">›</button><div class="rightbar-section"><div class="rightbar-heading">Favourites</div><ul class="fav-list" id="favList"></ul><p class="fav-empty" id="favEmpty">Star an article to pin it here.</p></div></aside><main class="main" id="mainArea"></main><div class="sidebar-backdrop" id="sidebarBackdrop"></div><footer class="site-footer">&copy; 2026 Axtroid. All rights reserved.</footer></div><div class="modal-overlay" id="ticketOverlay"><div class="modal-box"><div class="modal-head"><h2>Submit a Request</h2><button class="modal-close" id="ticketCloseX">✕</button></div><div class="modal-body" id="ticketFormView"><div class="form-row"><label>Product</label><select id="ticketProduct"></select></div><div class="form-row"><label>Section</label><select id="ticketSection"></select></div><div class="form-row"><label>Topic</label><select id="ticketTopic"></select></div><div class="form-row"><label>Your query</label><div class="query-toolbar"><button type="button" id="ticketInsertImgBtn">🖼 Insert image</button></div><input type="file" accept="image/*" id="ticketImgFile" style="display:none;"><div class="query-editable" id="ticketQuery" contenteditable="true"></div></div><div class="form-row"><label>Email</label><input type="email" id="ticketEmail" placeholder="you@example.com" required></div><button class="modal-submit-btn" id="ticketSubmitBtn">Submit</button></div><div class="modal-body ticket-success" id="ticketSuccessView" style="display:none;"><div class="ok-icon">✓</div><p>Thank you for the feedback. Your query will be attended shortly.</p><button class="ticket-close-btn" id="ticketCloseBtn">Close</button></div></div></div><script>window.__KB_DATA__={"products":[{"id":"prod_0qsqwat","name":"Vyra S1","category":"VR"},{"id":"prod_t601we5","name":"Akaar E1","category":"3D Printers"}],"sections":[{"id":"sec_pwnzb60","productId":"prod_t601we5","title":"Getting Started","order":0},{"id":"sec_cht2y8w","productId":"prod_t601we5","title":"Manuals","order":1}],"topics":[{"id":"top_htxcudm","sectionId":"sec_pwnzb60","title":"Quick Start Guide","order":0,"updated":"24 Jul 2026","blocks":[{"id":"blk_7daii83","type":"heading","level":2,"html":"Thanks"},{"id":"blk_5dt4yrb","type":"heading","level":3,"html":"Before you begin:"},{"id":"blk_mctg4eq","type":"list","ordered":false,"items":["Place the printer on a stable, level surface.","Keep away from water and flammable materials.","Ensure proper ventilation.","Use a UPS or surge protector.","Read the complete User Manual before operation."]}]},{"id":"top_9shwwju","sectionId":"sec_cht2y8w","title":"User Manual","order":0,"updated":"24 Jul 2026","blocks":[]},{"id":"top_gokm2wq","sectionId":"sec_pwnzb60","title":"System Requirements","order":1,"updated":"24 Jul 2026","blocks":[]}],"changelog":[{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"\"Quick Start Guide\" — 1 block(s) edited."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"\"Quick Start Guide\" — No visible content change."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"System Requirements\"."},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"System Requirements"},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"User Manual\"."},{"date":"24 Jul 2026","tag":"updated","product":"Vyra S1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Vyra S1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"User Manual"},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"User Manual"},{"date":"24 Jul 2026","tag":"updated","product":"Sample Product","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"Quick Start Guide"},{"date":"24 Jul 2026","tag":"added","product":"Sample Product","text":"Knowledge base created."}]};window.__KB_READONLY__=true;window.__GH_CONFIG__={"settings":{"owner":"axtroid","repo":"documentation","path":"docs/index.html","branch":"main"}};(function(){
+.mode-toggle,.export-btn,#addProductBtn,.add-btn,.row-actions .icon-sm,.revert-btn{display:none !important;}</style></head><body><div class="kb-shell" id="kbShell"><header class="topbar"><button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button><div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid"><img class="brand-logo-mobile" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid-mini.png" alt="Axtroid"><div class="brand-text"><span class="brand-name"> SUPPORT</span></div></div><div class="search-wrap" id="searchWrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off"><div class="search-results" id="searchResults"></div></div></header><aside class="sidebar" id="sidebar"><div class="sidebar-inner"><div class="sidebar-section"><div class="sidebar-heading"><span>Product</span></div><select class="product-select" id="productSelect"></select></div><div class="sidebar-section" style="flex:1;"><div class="sidebar-heading"><span id="docsHeading">Documentation</span></div><ul class="nav-tree" id="navTree"></ul></div><div class="sidebar-footer">Axtroid Documentation Support is the official knowledge base for Axtroid products, covering setup, troubleshooting and best practices. Last updated 26 Jul 2026 — v1.0.3.</div></div></aside><aside class="rightbar" id="rightbar"><button class="rightbar-toggle" id="rightbarToggle" title="Collapse">›</button><div class="rightbar-body"><div class="rightbar-section" id="topicSummarySection" style="display:none;"><div class="rightbar-heading">On This Page</div><ul class="general-list" id="topicSummaryList"></ul></div><div class="rightbar-section"><div class="rightbar-heading">Favourites</div><ul class="fav-list" id="favList"></ul><p class="fav-empty" id="favEmpty">Star an article to pin it here.</p></div></div></aside><main class="main" id="mainArea"></main><div class="sidebar-backdrop" id="sidebarBackdrop"></div><footer class="site-footer">&copy; 2026 Axtroid. All rights reserved.</footer></div><div class="modal-overlay" id="ticketOverlay"><div class="modal-box"><div class="modal-head"><h2>Submit a Request</h2><button class="modal-close" id="ticketCloseX">✕</button></div><div class="modal-body" id="ticketFormView"><div class="form-row"><label>Product</label><select id="ticketProduct"></select></div><div class="form-row"><label>Section</label><select id="ticketSection"></select></div><div class="form-row"><label>Topic</label><select id="ticketTopic"></select></div><div class="form-row"><label>Your query</label><div class="query-toolbar"><button type="button" id="ticketInsertImgBtn">🖼 Insert image</button></div><input type="file" accept="image/*" id="ticketImgFile" style="display:none;"><div class="query-editable" id="ticketQuery" contenteditable="true"></div></div><div class="form-row"><label>Email</label><input type="email" id="ticketEmail" placeholder="you@example.com" required></div><button class="modal-submit-btn" id="ticketSubmitBtn">Submit</button></div><div class="modal-body ticket-success" id="ticketSuccessView" style="display:none;"><div class="ok-icon">✓</div><p>Thank you for the feedback. Your query will be attended shortly.</p><button class="ticket-close-btn" id="ticketCloseBtn">Close</button></div></div></div><script>window.__KB_DATA__={"products":[{"id":"prod_0qsqwat","name":"Akaar L1","category":"3D Printers"},{"id":"prod_t601we5","name":"Akaar E1","category":"3D Printers"}],"sections":[{"id":"sec_pwnzb60","productId":"prod_t601we5","title":"Getting Started","order":0},{"id":"sec_cht2y8w","productId":"prod_t601we5","title":"Manuals","order":1}],"topics":[{"id":"top_htxcudm","sectionId":"sec_pwnzb60","title":"Quick Start Guide","order":0,"updated":"25 Jul 2026","blocks":[{"id":"blk_7daii83","type":"heading","level":2,"html":"Thanks"},{"id":"blk_5dt4yrb","type":"heading","level":3,"html":"Before you begin:"},{"id":"blk_mctg4eq","type":"list","ordered":false,"items":["Place the printer on a stable, level surface.","Keep away from water and flammable materials.","Ensure proper ventilation.","Use a UPS or surge protector.","Read the complete User Manual before operation."]}]},{"id":"top_9shwwju","sectionId":"sec_cht2y8w","title":"User Manual","order":0,"updated":"24 Jul 2026","blocks":[]},{"id":"top_gokm2wq","sectionId":"sec_pwnzb60","title":"System Requirements","order":1,"updated":"24 Jul 2026","blocks":[]}],"changelog":[{"date":"25 Jul 2026","tag":"updated","product":"Akaar E1","text":"\"Quick Start Guide\" updated","details":["No visible content change."]},{"date":"25 Jul 2026","tag":"updated","product":"Akaar E1","text":"\"Quick Start Guide\" updated","details":["No visible content change."]},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"\"Quick Start Guide\" — 1 block(s) edited."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"\"Quick Start Guide\" — No visible content change."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"System Requirements\"."},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"System Requirements"},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"User Manual\"."},{"date":"24 Jul 2026","tag":"updated","product":"Vyra S1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Vyra S1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"User Manual"},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"User Manual"},{"date":"24 Jul 2026","tag":"updated","product":"Sample Product","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"updated","product":"Akaar E1","text":"Updated \"Quick Start Guide\"."},{"date":"24 Jul 2026","tag":"added","product":"Akaar E1","text":"Quick Start Guide"},{"date":"24 Jul 2026","tag":"added","product":"Sample Product","text":"Knowledge base created."}]};window.__KB_READONLY__=true;window.__GH_CONFIG__={"settings":{"owner":"axtroid","repo":"documentation","path":"docs/index.html","branch":"main"}};(function(){
     var data = window.__KB_DATA__;
+    var openTicketModal; /* assigned below, called from the topic feedback widget */
     var favourites = [];
     try{ favourites = JSON.parse(localStorage.getItem('kb_favs')||'[]'); }catch(e){}
     function saveFavs(){ try{ localStorage.setItem('kb_favs', JSON.stringify(favourites)); }catch(e){} }
@@ -251,7 +288,7 @@
     function topicsFor(sid){return data.topics.filter(function(t){return t.sectionId===sid;}).sort(function(a,b){return a.order-b.order;});}
     function calloutHtml(type,html){return '<div class="callout callout-'+type+'"><span class="callout-icon">'+CALLOUT_ICONS[type]+'</span><div class="callout-body"><div class="callout-title">'+CALLOUT_LABELS[type]+'</div>'+html+'</div></div>';}
     function blockToHtml(b){
-      if (b.type==='heading'){var l=b.level||2;return '<h'+l+'>'+(b.html||'')+'</h'+l+'>';}
+      if (b.type==='heading'){var l=b.level||2;return '<h'+l+' id="blk-'+b.id+'">'+(b.html||'')+'</h'+l+'>';}
       if (b.type==='paragraph'){return '<p>'+(b.html||'')+'</p>';}
       if (b.type==='image'){return '<figure><img src="'+(b.src||'')+'" alt="'+esc(b.alt||'')+'">'+(b.caption?'<figcaption>'+esc(b.caption)+'</figcaption>':'')+'</figure>';}
       if (b.type==='callout'){return calloutHtml(b.calloutType||'note','<p>'+(b.html||'')+'</p>');}
@@ -341,7 +378,31 @@
     function renderMain(){
       var main=document.getElementById('mainArea');
       if(articleId){renderArticle(main);return;}
+      hideTopicSummary();
       main.innerHTML='<div class="empty-state">Select a topic from the sidebar.</div>';
+    }
+    function hideTopicSummary(){
+      var section=document.getElementById('topicSummarySection');
+      if(section) section.style.display='none';
+    }
+    function renderTopicSummary(t){
+      var section=document.getElementById('topicSummarySection'), list=document.getElementById('topicSummaryList');
+      if(!section||!list) return;
+      var headings=(t.blocks||[]).filter(function(b){return b.type==='heading';});
+      if(!headings.length){section.style.display='none';list.innerHTML='';return;}
+      section.style.display='block';
+      list.innerHTML=headings.map(function(b){
+        var lvl=b.level||2;
+        var text=(b.html||'').replace(/<[^>]+>/g,'').trim()||'Untitled section';
+        return '<li'+(lvl>=3?' style="padding-left:16px;"':'')+'><a href="#blk-'+b.id+'" data-jump="'+b.id+'">'+esc(text)+'</a></li>';
+      }).join('');
+      list.querySelectorAll('[data-jump]').forEach(function(el){
+        el.addEventListener('click',function(e){
+          e.preventDefault();
+          var target=document.getElementById('blk-'+el.getAttribute('data-jump'));
+          if(target){var y=target.getBoundingClientRect().top+window.pageYOffset-74;window.scrollTo({top:y,behavior:'smooth'});}
+        });
+      });
     }
     function renderArticle(main){
       var t=getTopic(articleId); if(!t)return;
@@ -354,9 +415,35 @@
         '<button class="fav-toggle'+(isFav?' is-fav':'')+'" id="favToggleBtn">★ '+(isFav?'Saved to favourites':'Add to favourites')+'</button>'+
         printMenuHtml()+
         '</div>'+
-        '<div class="article-body">'+(t.blocks||[]).map(blockToHtml).join('')+'</div>';
+        '<div class="article-body">'+(t.blocks||[]).map(blockToHtml).join('')+'</div>'+
+        '<div class="topic-feedback" id="topicFeedback">'+
+          '<span class="topic-feedback-question">Did you find the information useful?</span>'+
+          '<span class="topic-feedback-buttons">'+
+            '<button type="button" class="feedback-btn" data-feedback="yes">👍 Yes</button>'+
+            '<button type="button" class="feedback-btn" data-feedback="no">👎 No</button>'+
+          '</span>'+
+        '</div>';
       document.getElementById('favToggleBtn').addEventListener('click',function(){toggleFav(t.id);renderArticle(main);});
       bindPrintMenu(t.title);
+      bindTopicFeedback();
+      renderTopicSummary(t);
+    }
+    function bindTopicFeedback(){
+      var box=document.getElementById('topicFeedback');
+      if(!box) return;
+      box.querySelectorAll('[data-feedback]').forEach(function(btn){
+        btn.addEventListener('click',function(){
+          box.classList.add('is-answered');
+          box.querySelectorAll('[data-feedback]').forEach(function(b){b.classList.remove('is-picked');});
+          btn.classList.add('is-picked');
+          if (btn.getAttribute('data-feedback')==='yes'){
+            box.querySelector('.topic-feedback-question').textContent='Thank you for the feedback!';
+          } else {
+            box.querySelector('.topic-feedback-question').textContent='Sorry about that — tell us more:';
+            openTicketModal();
+          }
+        });
+      });
     }
     function buildIdx(){var idx=[];data.topics.forEach(function(t){var sec=getSection(t.sectionId);if(!sec)return;var prod=getProduct(sec.productId);if(!prod)return;idx.push({id:t.id,title:t.title,path:prod.name+' › '+sec.title});});return idx;}
     var wrap=document.getElementById('searchWrap'),input=document.getElementById('kbSearch'),results=document.getElementById('searchResults');
@@ -441,7 +528,7 @@
         var sid=document.getElementById('ticketSection').value;
         document.getElementById('ticketTopic').innerHTML = topicsFor(sid).map(function(t){return '<option value="'+t.id+'">'+esc(t.title)+'</option>';}).join('');
       }
-      function openTicketModal(){
+      openTicketModal = function(){
         document.getElementById('ticketProduct').innerHTML = ticketProductOptions();
         refreshTicketSections();
         document.getElementById('ticketQuery').innerHTML = '';
@@ -449,9 +536,8 @@
         document.getElementById('ticketFormView').style.display='block';
         document.getElementById('ticketSuccessView').style.display='none';
         document.getElementById('ticketOverlay').classList.add('is-open');
-      }
+      };
       function closeTicketModal(){ document.getElementById('ticketOverlay').classList.remove('is-open'); }
-      document.getElementById('submitRequestBtn').addEventListener('click', openTicketModal);
       document.getElementById('ticketCloseX').addEventListener('click', closeTicketModal);
       document.getElementById('ticketCloseBtn').addEventListener('click', closeTicketModal);
       document.getElementById('ticketOverlay').addEventListener('click', function(e){ if(e.target===this) closeTicketModal(); });
