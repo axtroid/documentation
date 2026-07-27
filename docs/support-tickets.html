@@ -84,9 +84,9 @@
   .sidebar-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--ink-line);text-align:center;font-size:.72rem;color:var(--sidebar-text-dim);}
 
   /* rightbar */
-  .rightbar{grid-area:rightbar;background:var(--paper-raised);border-left:1px solid var(--paper-line);padding:0;position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100dvh - 62px);overflow:visible;transition:width .18s ease;width:var(--rightbar-w);flex-shrink:0;}
-  .rightbar-body{height:100%;overflow-y:auto;overflow-x:hidden;}
-  .rightbar-toggle{position:absolute;top:50%;left:-13px;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:26px;height:56px;background:var(--paper-raised);border:1px solid var(--paper-line);border-right:none;border-radius:8px 0 0 8px;color:var(--text-muted);cursor:pointer;font-size:.85rem;box-shadow:-2px 2px 8px rgba(0,0,0,.1);z-index:5;}
+  .rightbar{grid-area:rightbar;background:var(--paper-raised);border-left:1px solid var(--paper-line);padding:0;position:relative;align-self:stretch;height:100%;overflow:visible;transition:width .18s ease;width:var(--rightbar-w);flex-shrink:0;}
+  .rightbar-body{position:sticky;top:62px;height:calc(100vh - 62px);height:calc(100dvh - 62px);overflow-y:auto;overflow-x:hidden;}
+  .rightbar-toggle{position:absolute;top:4in;left:-13px;display:flex;align-items:center;justify-content:center;width:26px;height:56px;background:var(--paper-raised);border:1px solid var(--paper-line);border-right:none;border-radius:8px 0 0 8px;color:var(--text-muted);cursor:pointer;font-size:.85rem;box-shadow:-2px 2px 8px rgba(0,0,0,.1);z-index:5;}
   .rightbar-toggle:hover{background:#F1ECE1;color:var(--ink);}
   .rightbar.collapsed{width:var(--rightbar-w-collapsed);}
   .rightbar.collapsed .rightbar-body{display:none;}
@@ -105,6 +105,8 @@
   /* main */
   .main{grid-area:main;padding:36px 48px 80px;max-width:820px;}
   .breadcrumb{font-size:.8rem;color:var(--text-muted);margin-bottom:16px;}
+  .history-back-home{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;font-weight:600;color:var(--accent-dark);margin-bottom:14px;cursor:pointer;}
+  .history-back-home:hover{text-decoration:underline;}
   .article-kicker{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-dark);margin-bottom:8px;}
   h1.article-title{font-family:var(--font-display);font-size:2.1rem;font-weight:700;margin:0 0 10px;color:var(--ink);}
   .article-meta{display:flex;align-items:center;gap:12px;font-size:.8rem;color:var(--text-muted);}
@@ -182,6 +184,7 @@
     }
     .rightbar.collapsed{width:82vw;max-width:300px;}
     .rightbar.collapsed .rightbar-body{display:block;}
+    .rightbar-body{position:static;height:100%;}
     .rightbar-toggle{display:none;}
     .kb-shell.rightbar-open .rightbar{transform:translateX(0);}
     .kb-shell.rightbar-open .rightbar-backdrop{display:block;position:fixed;top:62px;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:50;}
@@ -317,6 +320,37 @@
     .topbar-actions .settings-btn{width:100%;border-radius:8px;}
     .topbar-actions .revert-btn,.topbar-actions .export-btn,.topbar-actions .submit-request-btn--top{width:100%;border-radius:8px;text-align:center;}
   }
+
+  /* ---------------- resizable + collapsible sidebar ---------------- */
+  .kb-shell{transition:grid-template-columns .18s ease;}
+  .sidebar{min-width:0;}
+  @media (min-width:1181px){ .sidebar{position:relative;} }
+  .sidebar-resizer{position:absolute;top:0;bottom:0;right:-4px;width:8px;cursor:col-resize;z-index:16;background:transparent;}
+  .sidebar-resizer:hover,.sidebar-resizer.is-dragging{background:rgba(242,162,59,.35);}
+  .sidebar-toggle{position:absolute;top:4in;right:-13px;display:flex;align-items:center;justify-content:center;width:26px;height:56px;background:var(--ink-soft);border:1px solid var(--ink-line);border-left:none;border-radius:0 8px 8px 0;color:#fff;cursor:pointer;font-size:.85rem;line-height:1;z-index:17;box-shadow:2px 2px 8px rgba(0,0,0,.25);}
+  .sidebar-toggle:hover{background:var(--sidebar-active);}
+  .kb-shell.sidebar-collapsed{grid-template-columns:0px 1fr auto;}
+  .kb-shell.sidebar-collapsed .sidebar{border-right:none;}
+  .kb-shell.sidebar-collapsed .sidebar-inner{opacity:0;pointer-events:none;transition:opacity .1s ease;}
+  .kb-shell.sidebar-collapsed .sidebar-resizer{display:none;}
+  @media (max-width:1180px){
+    .sidebar-toggle,.sidebar-resizer{display:none;}
+    .kb-shell.sidebar-collapsed{grid-template-columns:var(--sidebar-w) 1fr;}
+  }
+
+  /* ---------------- preloader ---------------- */
+  .preloader{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;z-index:600;transition:opacity .5s ease,visibility .5s ease;}
+  .preloader.is-hidden{opacity:0;visibility:hidden;pointer-events:none;}
+  .preloader-inner{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;}
+  .preloader-ring-wrap{position:relative;width:112px;height:112px;display:flex;align-items:center;justify-content:center;}
+  .preloader-ring{position:absolute;inset:0;border:3px solid var(--ink-line);border-top-color:var(--accent);border-radius:50%;animation:preloaderSpin 1s linear infinite;}
+  .preloader-ring-2{position:absolute;inset:14px;border:3px solid transparent;border-bottom-color:var(--gold);border-radius:50%;animation:preloaderSpin 1.6s linear infinite reverse;}
+  .preloader-logo{height:52px;width:auto;position:relative;z-index:2;animation:preloaderPulse 1.6s ease-in-out infinite;}
+  .preloader-text{font-family:var(--font-display);letter-spacing:.14em;text-transform:uppercase;font-size:.78rem;font-weight:700;color:var(--sidebar-text-dim);animation:preloaderFade 1.6s ease-in-out infinite;}
+  @keyframes preloaderSpin{to{transform:rotate(360deg);}}
+  @keyframes preloaderPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.09);opacity:.82;}}
+  @keyframes preloaderFade{0%,100%{opacity:.45;}50%{opacity:1;}}
+
 
 .tickets-wrap{max-width:900px;margin:0 auto;padding:36px 24px 80px;}.tickets-topbar{display:flex;align-items:center;gap:12px;padding:0 24px;height:62px;background:var(--ink);}.ticket-card{border:1px solid var(--paper-line);border-radius:var(--radius);background:var(--paper-raised);margin-bottom:16px;overflow:hidden;}.ticket-card-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:12px 16px;background:#F3EFE6;font-size:.8rem;color:var(--text-muted);}.ticket-card-head strong{color:var(--ink);}.ticket-status{margin-left:auto;font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 10px;border-radius:999px;}.ticket-status.open{background:#FBE9E7;color:#B3261E;} .ticket-status.in-progress{background:#FBF1E1;color:var(--accent-dark);} .ticket-status.resolved{background:#E5F2E3;color:#2F7A34;}.ticket-card-body{padding:16px;font-size:.9rem;line-height:1.6;}.ticket-card-body img{max-width:100%;border-radius:6px;margin:6px 0;display:block;}.ticket-meta-row{font-size:.78rem;color:var(--text-muted);margin-top:10px;}.ticket-actions{display:flex;gap:8px;padding:0 16px 16px;}.ticket-actions button{border:1px solid var(--paper-line);background:#fff;border-radius:999px;padding:6px 14px;font-size:.78rem;cursor:pointer;}.ticket-actions button:hover{border-color:var(--accent);color:var(--accent-dark);}.ticket-actions button.is-current{background:var(--ink);color:#fff;border-color:var(--ink);}</style></head><body style="background:var(--paper);"><header class="tickets-topbar"><div class="brand"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid"><img class="brand-logo-mobile" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid-mini.png" alt="Axtroid"><div class="brand-text"><span class="brand-name">SUPPORT TICKETS</span></div></div></header><div class="tickets-wrap"><div id="ticketsList">Loading tickets…</div></div><script>window.__GH_CONFIG__={"settings":{"owner":"axtroid","repo":"documentation","path":"docs/index.html","branch":"main"}};(function(){
     var GH = window.__GH_CONFIG__ || {settings:{}, token:null};
