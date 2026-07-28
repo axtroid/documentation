@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Knowledge Base</title><style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Knowledge Base</title><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script><style>
   :root{
     --ink:#1C1B1F; --ink-soft:#262529; --ink-line:#38363B;
     --paper:#FAF8F4; --paper-raised:#FFFFFF; --paper-line:#E7E2D8;
@@ -122,7 +122,11 @@
   .article-body li{margin-bottom:5px;}
   .article-body pre{background:#EFEAE0;border-radius:var(--radius);padding:12px 14px;overflow-x:auto;font-family:var(--font-mono);font-size:.85rem;}
   .article-body figure{margin:20px 0;}
-  .article-body img{display:block;max-width:100%;height:auto;border-radius:var(--radius);border:1px solid var(--paper-line);}
+  .article-body img{display:block;max-width:100%;height:auto;border-radius:var(--radius);border:1px solid var(--paper-line);cursor:zoom-in;}
+  .img-lightbox{display:none;position:fixed;inset:0;background:rgba(15,14,12,.78);z-index:300;align-items:center;justify-content:center;padding:32px;}
+  .img-lightbox.is-open{display:flex;}
+  .img-lightbox img{max-width:92vw;max-height:92vh;border-radius:10px;box-shadow:0 24px 64px rgba(0,0,0,.55);pointer-events:none;user-select:none;}
+  .img-lightbox-hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:#fff;font-size:.78rem;opacity:.75;letter-spacing:.02em;}
   .article-body figcaption{margin-top:6px;font-size:.78rem;color:var(--text-muted);text-align:center;}
   .topic-feedback{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:36px 0 8px;padding:14px 16px;border:1px solid var(--paper-line);border-radius:var(--radius);background:#FBF9F5;font-size:.88rem;color:var(--text-main);}
   .topic-feedback-buttons{display:flex;gap:8px;}
@@ -352,12 +356,47 @@
   @keyframes preloaderFade{0%,100%{opacity:.45;}50%{opacity:1;}}
 
 
-.mode-toggle,.export-btn,#addProductBtn,.add-btn,.row-actions .icon-sm,.revert-btn{display:none !important;}</style></head><body><div class="kb-shell" id="kbShell"><header class="topbar"><button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button><div class="brand" id="brandHome" title="Go to home"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid"><img class="brand-logo-mobile" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid-mini.png" alt="Axtroid"><div class="brand-text"><span class="brand-name"> SUPPORT</span></div></div><div class="search-wrap" id="searchWrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off"><div class="search-results" id="searchResults"></div></div><button class="rightbar-mobile-btn" id="rightbarMobileBtn" title="Favourites" aria-label="Favourites">☆</button></header><aside class="sidebar" id="sidebar"><div class="sidebar-inner"><div class="sidebar-section"><div class="sidebar-heading"><span>Product</span></div><select class="product-select" id="productSelect"></select></div><div class="sidebar-section" style="flex:1;"><div class="sidebar-heading"><span id="docsHeading">Documentation</span></div><ul class="nav-tree" id="navTree"></ul></div><div class="sidebar-footer">Axtroid | Support — v1.0.3.</div></div></aside><aside class="rightbar" id="rightbar"><button class="rightbar-toggle" id="rightbarToggle" title="Collapse">›</button><div class="rightbar-body"><div class="rightbar-section" id="topicSummarySection" style="display:none;"><div class="rightbar-heading">On This Page</div><ul class="general-list" id="topicSummaryList"></ul></div><div class="rightbar-section"><div class="rightbar-heading">Favourites</div><ul class="fav-list" id="favList"></ul><p class="fav-empty" id="favEmpty">Star an article to pin it here.</p></div></div></aside><main class="main" id="mainArea"></main><div class="sidebar-backdrop" id="sidebarBackdrop"></div><div class="rightbar-backdrop" id="rightbarBackdrop"></div><footer class="site-footer">&copy; 2026 Axtroid. All rights reserved.</footer></div><div class="modal-overlay" id="ticketOverlay"><div class="modal-box"><div class="modal-head"><h2>Submit a Request</h2><button class="modal-close" id="ticketCloseX">✕</button></div><div class="modal-body" id="ticketFormView"><div class="form-row"><label>Product</label><select id="ticketProduct"></select></div><div class="form-row"><label>Section</label><select id="ticketSection"></select></div><div class="form-row"><label>Topic</label><select id="ticketTopic"></select></div><div class="form-row"><label>Your query</label><div class="query-toolbar"><button type="button" id="ticketInsertImgBtn">🖼 Insert image</button></div><input type="file" accept="image/*" id="ticketImgFile" style="display:none;"><div class="query-editable" id="ticketQuery" contenteditable="true"></div></div><div class="form-row"><label>Email</label><input type="email" id="ticketEmail" placeholder="you@example.com" required></div><button class="modal-submit-btn" id="ticketSubmitBtn">Submit</button></div><div class="modal-body ticket-success" id="ticketSuccessView" style="display:none;"><div class="ok-icon">✓</div><p>Thank you for the feedback. Your query will be attended shortly.</p><button class="ticket-close-btn" id="ticketCloseBtn">Close</button></div></div></div><script>window.__KB_DATA__={"products":[{"id":"prod_7y9y0h1","name":"Instructions","category":"General"}],"sections":[{"id":"sec_d1bkstr","productId":"prod_7y9y0h1","title":"Getting Started","order":0}],"topics":[{"id":"top_12f88pi","sectionId":"sec_d1bkstr","title":"Axtroid DocStudio v1.0.0","order":0,"updated":"27 Jul 2026","blocks":[{"id":"blk_97lobzl","type":"paragraph","html":"This is documentation authoring platform for Axtroid Documentation Portal www.axtroid.com/documentation.\u003cdiv>The DocStudio facilitates seamless integration to the live publishing on the portal with easy user interface.\u003c/div>"},{"id":"blk_anklasb","type":"heading","level":3,"html":"Prerequisites"},{"id":"blk_ih8twvu","type":"paragraph","html":"Always make sure you have necessary access to work on DocStudio."},{"id":"blk_y66c88n","type":"callout","calloutType":"tip","html":"Before you start using DocStudio, user must download the stand-alone app."},{"id":"blk_ua4gea0","type":"list","ordered":true,"items":["Once the app is downloaded on to the desktop, click to open the app.","Make sure you see instructions page.","Follow the instructions to set the real-time authoring-environment.","Click ⚙️Settings icon on the top left.","Fill the details as shown below then click Save Settings."]},{"id":"blk_ksu54fn","type":"list","ordered":false,"items":["Owner: axtroid","Repo: documentation","Path: docs/index.html (obtain it from your admin)","Branch: main","Personal access token: (obtain it from you admin)"]},{"id":"blk_iw98jvy","type":"callout","calloutType":"important","html":"Application must be restarted to sync with the live content on the server."}]}],"changelog":[{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["callout edited: \"Application must be restarted to sync with live content on t…\" → \"Application must be restarted to sync with the live content …\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["callout edited: \"Application must be restarted to sync the live from the serv…\" → \"Application must be restarted to sync with live content on t…\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["list edited: \"Once the app is downloaded on to the desktop, click to open …\" → \"Once the app is downloaded on to the desktop, click to open …\"","callout added: \"Application must be restarted to sync the live from the server.\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["list edited: \"Once the app is downloaded on to the desktop, click to open …\" → \"Once the app is downloaded on to the desktop, click to open …\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["No visible content change."]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["list added: \"Once the app is downloaded on to the desktop, click to open the app. | Make sure…\"","list added: \"Owner: axtroid | Repo: documentation | Path: docs/index.html (obtain it from you…\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["callout edited: \"User must download the redistributable version of DocStudio …\" → \"Before you start using DocStudio, user must download the sta…\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["Title renamed from \"Quick Start Guide\" to \"Axtroid DocStudio v1.0.0\".","paragraph edited: \"Replace this with your own content — add headings, images, c…\" → \"This is documentation authoring platform for Axtroid Documen…\"","heading added: \"Prerequisites\"","paragraph added: \"Always make sure you have necessary access to work on DocStudio.\"","callout added: \"User must download the redistributable version of DocStudio v1.0.0 from the admi…\"","callout removed: \"Use the Edit toggle at the top to author topics, then Generate site to export a …\""]},{"date":"27 Jul 2026","tag":"added","product":"Sample Product","text":"Knowledge base created."}]};window.__KB_READONLY__=true;window.__GH_CONFIG__={"settings":{"owner":"axtroid","repo":"documentation","path":"docs/index.html","branch":"main"}};(function(){
+.mode-toggle,.export-btn,#addProductBtn,.add-btn,.row-actions .icon-sm,.revert-btn{display:none !important;}</style></head><body><div class="kb-shell" id="kbShell"><header class="topbar"><button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button><div class="brand" id="brandHome" title="Go to home"><img class="brand-logo" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid.png" alt="Axtroid"><img class="brand-logo-mobile" src="https://raw.githubusercontent.com/axtroid/support/main/logo-axtroid-mini.png" alt="Axtroid"><div class="brand-text"><span class="brand-name"> SUPPORT</span></div></div><div class="search-wrap" id="searchWrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="kbSearch" placeholder="Search articles…" autocomplete="off"><div class="search-results" id="searchResults"></div></div><button class="rightbar-mobile-btn" id="rightbarMobileBtn" title="Favourites" aria-label="Favourites">☆</button></header><aside class="sidebar" id="sidebar"><div class="sidebar-inner"><div class="sidebar-section"><div class="sidebar-heading"><span>Product</span></div><select class="product-select" id="productSelect"></select></div><div class="sidebar-section" style="flex:1;"><div class="sidebar-heading"><span id="docsHeading">Documentation</span></div><ul class="nav-tree" id="navTree"></ul></div><div class="sidebar-footer">Axtroid | Support — v1.0.3.</div></div></aside><aside class="rightbar" id="rightbar"><button class="rightbar-toggle" id="rightbarToggle" title="Collapse">›</button><div class="rightbar-body"><div class="rightbar-section" id="topicSummarySection" style="display:none;"><div class="rightbar-heading">On This Page</div><ul class="general-list" id="topicSummaryList"></ul></div><div class="rightbar-section"><div class="rightbar-heading">Favourites</div><ul class="fav-list" id="favList"></ul><p class="fav-empty" id="favEmpty">Star an article to pin it here.</p></div></div></aside><main class="main" id="mainArea"></main><div class="sidebar-backdrop" id="sidebarBackdrop"></div><div class="rightbar-backdrop" id="rightbarBackdrop"></div><div class="img-lightbox" id="imgLightbox"><img src="" alt=""><span class="img-lightbox-hint">Release to close</span></div><footer class="site-footer">&copy; 2026 Axtroid. All rights reserved.</footer></div><div class="modal-overlay" id="ticketOverlay"><div class="modal-box"><div class="modal-head"><h2>Submit a Request</h2><button class="modal-close" id="ticketCloseX">✕</button></div><div class="modal-body" id="ticketFormView"><div class="form-row"><label>Product</label><select id="ticketProduct"></select></div><div class="form-row"><label>Section</label><select id="ticketSection"></select></div><div class="form-row"><label>Topic</label><select id="ticketTopic"></select></div><div class="form-row"><label>Your query</label><div class="query-toolbar"><button type="button" id="ticketInsertImgBtn">🖼 Insert image</button></div><input type="file" accept="image/*" id="ticketImgFile" style="display:none;"><div class="query-editable" id="ticketQuery" contenteditable="true"></div></div><div class="form-row"><label>Email</label><input type="email" id="ticketEmail" placeholder="you@example.com" required></div><button class="modal-submit-btn" id="ticketSubmitBtn">Submit</button></div><div class="modal-body ticket-success" id="ticketSuccessView" style="display:none;"><div class="ok-icon">✓</div><p>Thank you for the feedback. Your query will be attended shortly.</p><button class="ticket-close-btn" id="ticketCloseBtn">Close</button></div></div></div><script>window.__KB_DATA__={"products":[{"id":"prod_7y9y0h1","name":"Instructions","category":"General"}],"sections":[{"id":"sec_d1bkstr","productId":"prod_7y9y0h1","title":"Getting Started","order":0}],"topics":[{"id":"top_12f88pi","sectionId":"sec_d1bkstr","title":"Axtroid DocStudio v1.0.0","order":0,"updated":"27 Jul 2026","blocks":[{"id":"blk_97lobzl","type":"paragraph","html":"This is documentation authoring platform for Axtroid Documentation Portal www.axtroid.com/documentation.\u003cdiv>The DocStudio facilitates seamless integration to the live publishing on the portal with easy user interface.\u003c/div>"},{"id":"blk_anklasb","type":"heading","level":3,"html":"Prerequisites"},{"id":"blk_ih8twvu","type":"paragraph","html":"Always make sure you have necessary access to work on DocStudio."},{"id":"blk_y66c88n","type":"callout","calloutType":"tip","html":"Before you start using DocStudio, user must download the stand-alone app."},{"id":"blk_ua4gea0","type":"list","ordered":true,"items":["Once the app is downloaded on to the desktop, click to open the app.","Make sure you see instructions page.","Follow the instructions to set the real-time authoring-environment.","Click ⚙️Settings icon on the top left.","Fill the details as shown below then click Save Settings."]},{"id":"blk_ksu54fn","type":"list","ordered":false,"items":["Owner: axtroid","Repo: documentation","Path: docs/index.html (obtain it from your admin)","Branch: main","Personal access token: (obtain it from you admin)"]},{"id":"blk_iw98jvy","type":"callout","calloutType":"important","html":"Application must be restarted to sync with the live content on the server."}]}],"changelog":[{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["callout edited: \"Application must be restarted to sync with live content on t…\" → \"Application must be restarted to sync with the live content …\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["callout edited: \"Application must be restarted to sync the live from the serv…\" → \"Application must be restarted to sync with live content on t…\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["list edited: \"Once the app is downloaded on to the desktop, click to open …\" → \"Once the app is downloaded on to the desktop, click to open …\"","callout added: \"Application must be restarted to sync the live from the server.\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["list edited: \"Once the app is downloaded on to the desktop, click to open …\" → \"Once the app is downloaded on to the desktop, click to open …\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["No visible content change."]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["list added: \"Once the app is downloaded on to the desktop, click to open the app. | Make sure…\"","list added: \"Owner: axtroid | Repo: documentation | Path: docs/index.html (obtain it from you…\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["callout edited: \"User must download the redistributable version of DocStudio …\" → \"Before you start using DocStudio, user must download the sta…\""]},{"date":"27 Jul 2026","tag":"updated","product":"Instructions","text":"\"Axtroid DocStudio v1.0.0\" updated","details":["Title renamed from \"Quick Start Guide\" to \"Axtroid DocStudio v1.0.0\".","paragraph edited: \"Replace this with your own content — add headings, images, c…\" → \"This is documentation authoring platform for Axtroid Documen…\"","heading added: \"Prerequisites\"","paragraph added: \"Always make sure you have necessary access to work on DocStudio.\"","callout added: \"User must download the redistributable version of DocStudio v1.0.0 from the admi…\"","callout removed: \"Use the Edit toggle at the top to author topics, then Generate site to export a …\""]},{"date":"27 Jul 2026","tag":"added","product":"Sample Product","text":"Knowledge base created."}]};window.__KB_READONLY__=true;window.__GH_CONFIG__={"settings":{"owner":"axtroid","repo":"documentation","path":"docs/index.html","branch":"main"}};(function(){
     var data = window.__KB_DATA__;
+    var GH = window.__GH_CONFIG__ || {settings:{}};
     var openTicketModal; /* assigned below, called from the topic feedback widget */
     var favourites = [];
     try{ favourites = JSON.parse(localStorage.getItem('kb_favs')||'[]'); }catch(e){}
     function saveFavs(){ try{ localStorage.setItem('kb_favs', JSON.stringify(favourites)); }catch(e){} }
+    /* ---------- lazy per-topic content loading ----------
+       data.topics only carries metadata (title/order/file) — each
+       topic's actual blocks live in their own JSON file, published
+       alongside index.html. Public repos need no auth to read, so this
+       fetches straight from raw.githubusercontent.com (falls back to a
+       localStorage mirror when offline or before anything's published). */
+    var topicContentCache = {};
+    function topicLocalKey(id){ return 'kb_topic_content_' + id; }
+    function siblingPath(filename){ return (GH.settings.path||'').replace(/[^/]+$/,'') + filename; }
+    function rawUrl(path){ return 'https://raw.githubusercontent.com/'+GH.settings.owner+'/'+GH.settings.repo+'/'+GH.settings.branch+'/'+path; }
+    function ensureTopicLoaded(topicId){
+      if (topicContentCache[topicId]) return Promise.resolve(topicContentCache[topicId]);
+      var t = getTopic(topicId);
+      var fromLocal = function(){
+        var blocks = [];
+        try{ blocks = JSON.parse(localStorage.getItem(topicLocalKey(topicId))||'[]'); }catch(e){}
+        return blocks;
+      };
+      var configured = GH.settings.owner && GH.settings.repo && GH.settings.branch && t && t.file;
+      var loadPromise = configured
+        ? fetch(rawUrl(siblingPath(t.file)), {cache:'no-store'}).then(function(res){
+            if (!res.ok) throw new Error('content not published ('+res.status+')');
+            return res.json();
+          }).then(function(parsed){ return parsed.blocks || []; }).catch(function(e){
+            console.warn('Could not load topic content for "'+(t?t.title:topicId)+'":', e.message);
+            return fromLocal();
+          })
+        : Promise.resolve(fromLocal());
+      return loadPromise.then(function(blocks){
+        topicContentCache[topicId] = blocks;
+        try{ localStorage.setItem(topicLocalKey(topicId), JSON.stringify(blocks)); }catch(e){}
+        return blocks;
+      });
+    }
     var CALLOUT_LABELS={note:'Note',tip:'Tip',important:'Important',warning:'Warning',caution:'Caution'};
     var CALLOUT_ICONS={note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 11h1v5h1"/></svg>',tip:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M12 2a6 6 0 00-3.5 10.9c.6.5 1 1.3 1 2.1h5c0-.8.4-1.6 1-2.1A6 6 0 0012 2z"/></svg>',important:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3v18"/><path d="M5 4h11l-2 4 2 4H5"/></svg>',warning:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l10 18H2z"/><path d="M12 10v4"/><path d="M12 17h.01"/></svg>',caution:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>'};
     function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -377,8 +416,33 @@
       return '';
     }
     var PRINT_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>';
+    function downloadTopicPdf(topicTitle){
+      var articleEl = document.querySelector('.article-body');
+      if (!articleEl) return;
+      if (typeof html2pdf === 'undefined'){ window.print(); return; }
+      var wrapper = document.createElement('div');
+      wrapper.style.padding = '18px 6px';
+      wrapper.style.fontFamily = getComputedStyle(document.body).fontFamily;
+      var h1 = document.createElement('h1');
+      h1.textContent = topicTitle || document.title;
+      h1.style.cssText = 'font-size:22px;margin:0 0 14px;';
+      wrapper.appendChild(h1);
+      var clone = articleEl.cloneNode(true);
+      clone.querySelectorAll('img').forEach(function(img){ img.style.cursor = 'default'; });
+      wrapper.appendChild(clone);
+      var filename = (topicTitle||'topic').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '.pdf';
+      html2pdf().set({
+        margin: 12,
+        filename: filename,
+        image: { type:'jpeg', quality:0.95 },
+        html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff' },
+        jsPDF: { unit:'mm', format:'a4', orientation:'portrait' },
+        pagebreak: { mode:['avoid-all','css','legacy'] }
+      }).from(wrapper).save().catch(function(e){ console.error(e); });
+    }
     function printMenuHtml(){
       return '<div class="print-menu" id="printMenu">'+
+
         '<button type="button" class="print-btn" id="printBtn" title="Print or save as PDF" aria-haspopup="true">'+PRINT_ICON_SVG+'</button>'+
         '<div class="print-dropdown" id="printDropdown">'+
           '<button type="button" data-print-action="pdf">⬇ Save as PDF</button>'+
@@ -392,6 +456,8 @@
       menu.querySelectorAll('[data-print-action]').forEach(function(b){
         b.addEventListener('click', function(){
           menu.classList.remove('is-open');
+          var action = b.getAttribute('data-print-action');
+          if (action==='pdf'){ downloadTopicPdf(topicTitle); return; }
           var prevTitle=document.title;
           document.title = topicTitle || prevTitle;
           var restored=false;
@@ -402,6 +468,30 @@
         });
       });
     }
+    function bindImageLightbox(){
+      var overlay = document.getElementById('imgLightbox');
+      if (!overlay || overlay._bound) return;
+      overlay._bound = true;
+      var img = overlay.querySelector('img');
+      function open(src, alt){ img.src=src; img.alt=alt||''; overlay.classList.add('is-open'); }
+      function close(){ overlay.classList.remove('is-open'); img.src=''; }
+      document.addEventListener('mousedown', function(e){
+        var target = e.target.closest('.article-body img, .img-preview');
+        if (!target) return;
+        e.preventDefault();
+        open(target.src, target.alt);
+      });
+      document.addEventListener('mouseup', close);
+      document.addEventListener('mouseleave', close);
+      document.addEventListener('touchstart', function(e){
+        var target = e.target.closest('.article-body img, .img-preview');
+        if (!target) return;
+        open(target.src, target.alt);
+      }, {passive:true});
+      document.addEventListener('touchend', close);
+      document.addEventListener('touchcancel', close);
+    }
+    bindImageLightbox();
     document.addEventListener('click', function(e){
       var pm=document.getElementById('printMenu');
       if (pm && pm.classList.contains('is-open') && !pm.contains(e.target)) pm.classList.remove('is-open');
@@ -537,10 +627,10 @@
       var section=document.getElementById('topicSummarySection');
       if(section) section.style.display='none';
     }
-    function renderTopicSummary(t){
+    function renderTopicSummary(t, blocks){
       var section=document.getElementById('topicSummarySection'), list=document.getElementById('topicSummaryList');
       if(!section||!list) return;
-      var headings=(t.blocks||[]).filter(function(b){return b.type==='heading';});
+      var headings=(blocks||[]).filter(function(b){return b.type==='heading';});
       if(!headings.length){section.style.display='none';list.innerHTML='';return;}
       section.style.display='block';
       list.innerHTML=headings.map(function(b){
@@ -567,7 +657,7 @@
         '<button class="fav-toggle'+(isFav?' is-fav':'')+'" id="favToggleBtn">★ '+(isFav?'Saved to favourites':'Add to favourites')+'</button>'+
         printMenuHtml()+
         '</div>'+
-        '<div class="article-body">'+(t.blocks||[]).map(blockToHtml).join('')+'</div>'+
+        '<div class="article-body" id="articleBody"><p style="color:var(--text-muted);">Loading…</p></div>'+
         '<div class="topic-feedback" id="topicFeedback">'+
           '<span class="topic-feedback-question">Did you find the information useful?</span>'+
           '<span class="topic-feedback-buttons">'+
@@ -578,7 +668,13 @@
       document.getElementById('favToggleBtn').addEventListener('click',function(){toggleFav(t.id);renderArticle(main);});
       bindPrintMenu(t.title);
       bindTopicFeedback();
-      renderTopicSummary(t);
+      hideTopicSummary();
+      ensureTopicLoaded(t.id).then(function(blocks){
+        if (articleId !== t.id) return;
+        var body = document.getElementById('articleBody');
+        if (body) body.innerHTML = blocks.map(blockToHtml).join('');
+        renderTopicSummary(t, blocks);
+      });
     }
     function bindTopicFeedback(){
       var box=document.getElementById('topicFeedback');
